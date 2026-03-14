@@ -1,5 +1,6 @@
 import { CategoryCard } from "../cards/CategoryCard.jsx";
 import { FilterPills } from "../ui/FilterPills.jsx";
+import { AdSlot } from "../ui/AdSlot.jsx";
 import { DOMAINS } from "../../data/domains.js";
 import { filterCategories } from "../../utils/filterUtils.js";
 import { CATEGORIES } from "../../data/categories.js";
@@ -27,8 +28,11 @@ export function CategoriesSection({ search, activeDomain, onDomainChange, onOpen
         <FilterPills options={DOMAINS} active={activeDomain} onChange={onDomainChange}/>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: 14 }}>
-        {filteredCats.map(cat => (
-          <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)}/>
+        {filteredCats.map((cat, i) => (
+          <>
+            <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)}/>
+            {i === 10 && <AdSlot key="ad-grid" slot="1205581780" variant="grid"/>}
+          </>
         ))}
       </div>
       {search && filteredCats.length === 0 && (

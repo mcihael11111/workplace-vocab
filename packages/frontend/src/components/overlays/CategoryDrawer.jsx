@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { ALL_WORDS } from "../../data/words.js";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { DrawerWordRow } from "./DrawerWordRow.jsx";
+import { AdSlot } from "../ui/AdSlot.jsx";
 
 // Right-side panel (desktop) / bottom sheet (mobile) showing all terms in a category.
 // onOpenCard(words, index) — called when a term row is clicked.
@@ -80,12 +81,15 @@ export function CategoryDrawer({ cat, onClose, onOpenCard }) {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {words.map((word, i) => (
-                <DrawerWordRow
-                  key={word.term}
-                  word={word}
-                  cat={cat}
-                  onOpen={() => onOpenCard(words, i)}
-                />
+                <>
+                  <DrawerWordRow
+                    key={word.term}
+                    word={word}
+                    cat={cat}
+                    onOpen={() => onOpenCard(words, i)}
+                  />
+                  {i === 3 && <AdSlot key="ad-drawer" slot="1205581780" variant="drawer"/>}
+                </>
               ))}
             </div>
           )}
