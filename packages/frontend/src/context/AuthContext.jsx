@@ -5,7 +5,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   onAuthStateChanged,
-  signInWithPopup,
+  signInWithRedirect,
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase.js";
@@ -19,7 +19,8 @@ export function AuthProvider({ children }) {
     return onAuthStateChanged(auth, setUser);
   }, []);
 
-  const signInWithGoogle = () => signInWithPopup(auth, googleProvider);
+  // signInWithRedirect navigates to Google then returns — no popup, works on all browsers/domains
+  const signInWithGoogle = () => signInWithRedirect(auth, googleProvider);
   const signOut          = () => firebaseSignOut(auth);
 
   return (
