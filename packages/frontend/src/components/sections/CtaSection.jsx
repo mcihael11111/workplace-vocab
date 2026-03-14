@@ -1,5 +1,5 @@
 // Dark navy CTA block shown above the footer.
-export function CtaSection() {
+export function CtaSection({ onOpenLogin }) {
   return (
     <section
       id="about"
@@ -22,16 +22,16 @@ export function CtaSection() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 200 }}>
           <button
-            onClick={() => document.getElementById("categories")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={onOpenLogin}
             style={{ background: "#fff", color: "#1A1A2E", border: "none", borderRadius: 10, padding: "14px 28px", fontSize: 15, fontWeight: 700, cursor: "pointer" }}
           >
-            Browse all categories →
+            Start learning →
           </button>
           <button
-            onClick={() => document.getElementById("flashcards")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => document.getElementById("categories")?.scrollIntoView({ behavior: "smooth" })}
             style={{ background: "none", color: "#64748B", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px 28px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}
           >
-            Try flashcard mode
+            Browse all categories
           </button>
         </div>
       </div>
