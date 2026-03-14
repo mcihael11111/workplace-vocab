@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "../ui/Badge.jsx";
 import { RelatedChip } from "../ui/RelatedChip.jsx";
 import { ChevronBtn } from "../ui/ChevronBtn.jsx";
@@ -13,6 +13,10 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
   const cat = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: "📖" };
   const total = words.length;
   const isMobile = useWindowSize() < 768;
+  const [scenarioOpen, setScenarioOpen] = useState(false);
+  const [conversationOpen, setConversationOpen] = useState(false);
+
+  useEffect(() => { setScenarioOpen(false); setConversationOpen(false); }, [activeIndex]);
 
   // Keyboard nav
   useEffect(() => {
@@ -109,11 +113,30 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Why it matters</p>
             <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
           </section>
-          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 26 }}/>
+          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 16 }}/>
+          <section style={{ marginBottom: 16 }}>
+            <button onClick={() => setScenarioOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", padding: "10px 0", cursor: "pointer" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8" }}>Example</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: scenarioOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+            <div style={{ overflow: "hidden", maxHeight: scenarioOpen ? "600px" : "0", transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: scenarioOpen ? 1 : 0 }}>
+              <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.72, margin: "0 0 10px" }}>{word.scenario}</p>
+            </div>
+          </section>
+          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 16 }}/>
           <section style={{ marginBottom: 26 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>In a real conversation</p>
-            <div style={{ background: "#1A1A2E", borderRadius: 14, padding: "20px 22px", borderLeft: `4px solid ${cat.accent}` }}>
-              <p style={{ fontSize: 15, color: "#E2E8F0", lineHeight: 1.65, margin: 0, fontStyle: "italic" }}>{word.example}</p>
+            <button onClick={() => setConversationOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", padding: "10px 0", cursor: "pointer" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8" }}>In a real conversation</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+            <div style={{ overflow: "hidden", maxHeight: conversationOpen ? "600px" : "0", transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: conversationOpen ? 1 : 0 }}>
+              <div style={{ background: "#1A1A2E", borderRadius: 14, padding: "20px 22px", borderLeft: `4px solid ${cat.accent}`, marginBottom: 10 }}>
+                <p style={{ fontSize: 15, color: "#E2E8F0", lineHeight: 1.65, margin: 0, fontStyle: "italic" }}>{word.example}</p>
+              </div>
             </div>
           </section>
           {word.related && (
