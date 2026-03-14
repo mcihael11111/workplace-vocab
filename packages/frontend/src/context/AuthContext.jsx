@@ -6,6 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
   onAuthStateChanged,
   signInWithRedirect,
+  getRedirectResult,
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase.js";
@@ -16,6 +17,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(undefined);
 
   useEffect(() => {
+    // Process any pending redirect result (fires after returning from Google)
+    getRedirectResult(auth).catch(() => {});
     return onAuthStateChanged(auth, setUser);
   }, []);
 
