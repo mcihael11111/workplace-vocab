@@ -115,30 +115,30 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
           <div style={{ height: 1, background: "#F1F5F9", marginBottom: 26 }}/>
           <section style={{ marginBottom: 26 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Why it matters</p>
-            <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
+            <p style={{ fontSize: 15, color: "#1E293B", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
           </section>
-          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 16 }}/>
-          <section style={{ marginBottom: 16 }}>
-            <button onClick={() => setScenarioOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", padding: "10px 0", cursor: "pointer" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8" }}>Example</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: scenarioOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
+          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
+          <section style={{ marginBottom: 12 }}>
+            <button onClick={() => setScenarioOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: scenarioOpen ? "#F1F5F9" : "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", cursor: "pointer" }}>
+              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>Example</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: scenarioOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
                 <path d="M6 9l6 6 6-6"/>
               </svg>
             </button>
             <div style={{ overflow: "hidden", maxHeight: scenarioOpen ? "600px" : "0", transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: scenarioOpen ? 1 : 0 }}>
-              <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.72, margin: "0 0 10px" }}>{word.scenario}</p>
+              <p style={{ fontSize: 15, color: "#1E293B", lineHeight: 1.72, margin: "12px 4px 4px" }}>{word.scenario}</p>
             </div>
           </section>
-          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 16 }}/>
+          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
           <section style={{ marginBottom: 26 }}>
-            <button onClick={() => setConversationOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "none", padding: "10px 0", cursor: "pointer" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8" }}>In a real conversation</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
+            <button onClick={() => setConversationOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: conversationOpen ? "#F1F5F9" : "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", cursor: "pointer" }}>
+              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>In a real conversation</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
                 <path d="M6 9l6 6 6-6"/>
               </svg>
             </button>
             <div style={{ overflow: "hidden", maxHeight: conversationOpen ? "600px" : "0", transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: conversationOpen ? 1 : 0 }}>
-              <div style={{ background: "#1A1A2E", borderRadius: 14, padding: "20px 22px", borderLeft: `4px solid ${cat.accent}`, marginBottom: 10 }}>
+              <div style={{ background: "#1A1A2E", borderRadius: 14, padding: "20px 22px", borderLeft: `4px solid ${cat.accent}`, marginTop: 12, marginBottom: 4 }}>
                 <p style={{ fontSize: 15, color: "#E2E8F0", lineHeight: 1.65, margin: 0, fontStyle: "italic" }}>{word.example}</p>
               </div>
             </div>
