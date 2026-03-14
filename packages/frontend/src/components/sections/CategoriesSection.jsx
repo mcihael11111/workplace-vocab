@@ -7,7 +7,7 @@ import { CATEGORIES } from "../../data/categories.js";
 import { ALL_WORDS } from "../../data/words.js";
 
 // Category grid section with domain filter pills and search-driven heading.
-export function CategoriesSection({ search, activeDomain, onDomainChange, onOpenDrawer, completedTerms = new Set() }) {
+export function CategoriesSection({ search, activeDomain, onDomainChange, onOpenDrawer, completedTerms = new Set(), user }) {
   const filteredCats = filterCategories(CATEGORIES, activeDomain, search);
 
   return (
@@ -30,11 +30,12 @@ export function CategoriesSection({ search, activeDomain, onDomainChange, onOpen
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: 14 }}>
         {filteredCats.map((cat, i) => {
-          const catWords = ALL_WORDS.filter(w => w.category === cat.name);
-          const completedCount = catWords.filter(w => completedTerms.has(w.term)).length;
+          const catWords = user ? ALL_WORDS.filter(w => w.category === cat.name) : [];
+          const completedCount = user ? catWords.filter(w => completedTerms.has(w.term)).length : undefined;
+          const totalCount     = user ? catWords.length : undefined;
           return (
           <>
-            <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)} completedCount={completedCount} totalCount={catWords.length}/>
+            <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)} completedCount={completedCount} totalCount={totalCount}/>
             {i === 10 && <AdSlot key="ad-grid" slot="1205581780" variant="grid"/>}
           </>
           );

@@ -75,6 +75,7 @@ export default function App() {
             onDomainChange={setActiveDomain}
             onOpenDrawer={openDrawer}
             completedTerms={completedTerms}
+            user={user}
           />
           <FeaturedSection
             activeFilter={activeFilter}
