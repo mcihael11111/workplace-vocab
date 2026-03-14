@@ -5,12 +5,12 @@
 import { ALL_WORDS } from "./words.js";
 
 const FEATURED_TERMS = [
-  "Cognitive Load",
-  "Affinity Map",
-  "Design Token",
-  "Tone of Voice",
-  "MVP",
-  "Heuristic Evaluation",
+  "Cognitive Load",      // Product Design
+  "CI/CD",               // Engineering
+  "OKR",                 // Business
+  "Value Proposition",   // Marketing
+  "Burn Rate",           // Finance
+  "NDA",                 // Legal
 ];
 
 const FEATURED_WORDS = ALL_WORDS.filter(w => FEATURED_TERMS.includes(w.term));

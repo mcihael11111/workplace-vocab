@@ -12,7 +12,7 @@ export function HeroSection({ search, onSearchChange }) {
       <div className="fade-up" style={{ animationDelay: "0ms" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 99, padding: "5px 14px", marginBottom: 28, fontSize: 12, fontWeight: 600, color: "#16A34A", letterSpacing: "0.04em" }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E", display: "inline-block" }}/>
-          100+ terms across 4 domains — V2 live
+          {STATS[0].value} terms across {STATS[2].value} domains
         </div>
       </div>
       <h1
