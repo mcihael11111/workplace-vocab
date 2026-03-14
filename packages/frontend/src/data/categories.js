@@ -1,5 +1,5 @@
 // ─── CATEGORIES ─────────────────────────────────────────────────────────────
-// 19 categories across 4 domains.
+// 25 categories across 6 domains.
 // Shape: { id, name, domain, count, color, accent, icon, description }
 
 const CATEGORIES = [
@@ -24,12 +24,18 @@ const CATEGORIES = [
   { id: "testing",              name: "Testing",              domain: "Business",       count: 20, color: "#FFFBEB", accent: "#EAB308", icon: "📊", description: "A/B testing, heatmaps, conversion rate, cohort analysis" },
   { id: "positions",            name: "Positions",            domain: "Business",       count: 20, color: "#FDF2F8", accent: "#EC4899", icon: "👤", description: "PM, UX designer, design lead, CPO, Scrum Master" },
   // ── Marketing ─────────────────────────────────────────────────────────────
-  { id: "brand",                name: "Brand",                domain: "Marketing",      count: 20, color: "#F5F3FF", accent: "#8B5CF6", icon: "✦",  description: "Brand values, visual identity, equity, authenticity" },
-  { id: "marketing",            name: "Marketing",            domain: "Marketing",      count: 20, color: "#FFFBEB", accent: "#F59E0B", icon: "📣", description: "Funnels, CAC, LTV, SEO, retargeting, landing pages" },
+  { id: "brand",                name: "Brand",                domain: "Marketing",      count: 19, color: "#F5F3FF", accent: "#8B5CF6", icon: "✦",  description: "Brand values, visual identity, equity, authenticity" },
+  { id: "marketing-strategy",   name: "Marketing Strategy",   domain: "Marketing",      count: 9,  color: "#FFFBEB", accent: "#F59E0B", icon: "🎯", description: "GTM strategy, positioning, segmentation, value proposition" },
+  { id: "content-social",       name: "Content & Social",     domain: "Marketing",      count: 10, color: "#FFF7ED", accent: "#F97316", icon: "📱", description: "SEO, content marketing, email, social media, organic reach" },
+  { id: "paid-growth",          name: "Paid & Growth",        domain: "Marketing",      count: 9,  color: "#FEF2F2", accent: "#EF4444", icon: "📈", description: "Paid media, CRO, performance marketing, retargeting" },
   // ── Finance ───────────────────────────────────────────────────────────────
-  { id: "finance",              name: "Finance",              domain: "Finance",        count: 20, color: "#F0FDF4", accent: "#16A34A", icon: "💰", description: "Budget, burn rate, runway, P&L, unit economics, ROI" },
+  { id: "financial-fundamentals", name: "Financial Fundamentals", domain: "Finance",    count: 11, color: "#F0FDF4", accent: "#16A34A", icon: "💰", description: "Revenue, profit margin, P&L, gross margin, break-even, ROI" },
+  { id: "startup-finance",      name: "Startup Finance",      domain: "Finance",        count: 11, color: "#ECFDF5", accent: "#059669", icon: "🚀", description: "Burn rate, runway, ARR, unit economics, EBITDA, valuation" },
+  { id: "business-operations",  name: "Business Operations",  domain: "Finance",        count: 7,  color: "#F7FEE7", accent: "#65A30D", icon: "⚙️", description: "Cash flow, procurement, invoicing, accounts, fiscal planning" },
   // ── Legal ─────────────────────────────────────────────────────────────────
-  { id: "legal",                name: "Legal",                domain: "Legal",          count: 20, color: "#FFF7ED", accent: "#C2410C", icon: "⚖️", description: "NDAs, IP, copyright, GDPR, contracts, compliance" },
+  { id: "intellectual-property", name: "Intellectual Property", domain: "Legal",        count: 8,  color: "#FFF7ED", accent: "#C2410C", icon: "©",  description: "Copyright, trademark, patent, licensing, IP ownership" },
+  { id: "contracts-agreements", name: "Contracts & Agreements", domain: "Legal",        count: 10, color: "#FEF3C7", accent: "#D97706", icon: "📝", description: "NDA, contracts, SLA, indemnity, equity, shareholder agreements" },
+  { id: "compliance-data",      name: "Compliance & Data",    domain: "Legal",          count: 10, color: "#FFF1F2", accent: "#E11D48", icon: "🔒", description: "GDPR, privacy policy, compliance, data retention, acceptable use" },
 ];
 
 export { CATEGORIES };
