@@ -35,6 +35,10 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
     return () => { document.body.style.overflow = ""; };
   }, []);
 
+  // Reset scroll on card change
+  const scrollRef = useRef(null);
+  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [activeIndex]);
+
   // Touch swipe
   const touchStartX = useRef(null);
   const handleTouchStart = e => { touchStartX.current = e.touches[0].clientX; };
@@ -103,7 +107,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
         </div>
 
         {/* Scrollable body */}
-        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "28px 28px 24px" }}>
+        <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "28px 28px 24px" }}>
           <section style={{ marginBottom: 26 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>What it means</p>
             <p style={{ fontSize: 17, color: "#1A1A2E", lineHeight: 1.72, margin: 0 }}>{word.definition}</p>
@@ -162,11 +166,11 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "14px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#FAFAFA" }}>
+        <div style={{ padding: "14px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#FAFAFA", position: "relative" }}>
           <button onClick={onPrev} disabled={activeIndex === 0} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 600, color: activeIndex === 0 ? "#CBD5E1" : "#475569", cursor: activeIndex === 0 ? "not-allowed" : "pointer" }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>Previous
           </button>
-          <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 500 }}>
+          <span style={{ position: "absolute", left: 0, right: 0, textAlign: "center", fontSize: 12, color: "#94A3B8", fontWeight: 500, pointerEvents: "none" }}>
             {isMobile ? "swipe or tap buttons" : "← → to navigate"}
           </span>
           <button onClick={onNext} disabled={activeIndex === total - 1} style={{ display: "flex", alignItems: "center", gap: 6, background: activeIndex === total - 1 ? "#F8FAFC" : "#1A1A2E", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, color: activeIndex === total - 1 ? "#CBD5E1" : "#fff", cursor: activeIndex === total - 1 ? "not-allowed" : "pointer" }}>
