@@ -1,0 +1,18 @@
+// ─── FEATURED TERMS ─────────────────────────────────────────────────────────
+// The hand-picked terms shown in the "Start with these" flashcard section.
+// Add or swap term names here to update featured content — no other change needed.
+
+import { ALL_WORDS } from "./words.js";
+
+const FEATURED_TERMS = [
+  "Cognitive Load",
+  "Affinity Map",
+  "Design Token",
+  "Tone of Voice",
+  "MVP",
+  "Heuristic Evaluation",
+];
+
+const FEATURED_WORDS = ALL_WORDS.filter(w => FEATURED_TERMS.includes(w.term));
+
+export { FEATURED_TERMS, FEATURED_WORDS };

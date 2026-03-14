@@ -1,0 +1,84 @@
+// ─── PRISMA SCHEMA ──────────────────────────────────────────────────────────
+// Run `npm run db:migrate` to apply changes in development.
+// Run `npm run db:deploy`  to apply in production (CI/release command).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Phase 1 — Content models ─────────────────────────────────────────────────
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique  // e.g. "design-system"
+  name        String
+  domain      String            // "Product Design" | "Engineering" | "Business" | "Marketing"
+  icon        String
+  description String
+  color       String            // background hex
+  accent      String            // accent hex
+  count       Int               // denormalised term count
+  terms       Term[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Term {
+  id           String   @id @default(cuid())
+  slug         String   @unique  // e.g. "cognitive-load"
+  term         String
+  category     Category @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  level        Level
+  definition   String   @db.Text
+  whyItMatters String   @db.Text
+  example      String   @db.Text
+  related      String[]          // Term names (denormalised — normalise to a join table in Phase 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([level])
+}
+
+enum Level {
+  Beginner
+  Intermediate
+  Advanced
+}
+
+// ── Phase 2 — User models (uncomment when auth is ready) ─────────────────────
+
+// model User {
+//   id        String     @id @default(cuid())
+//   email     String     @unique
+//   name      String?
+//   createdAt DateTime   @default(now())
+//   progress  Progress[]
+//   bookmarks Bookmark[]
+// }
+
+// model Progress {
+//   id       String   @id @default(cuid())
+//   user     User     @relation(fields: [userId], references: [id])
+//   userId   String
+//   termId   String
+//   viewedAt DateTime @default(now())
+
+//   @@unique([userId, termId])
+// }
+
+// model Bookmark {
+//   id        String   @id @default(cuid())
+//   user      User     @relation(fields: [userId], references: [id])
+//   userId    String
+//   termId    String
+//   createdAt DateTime @default(now())
+
+//   @@unique([userId, termId])
+// }

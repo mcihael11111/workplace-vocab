@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+packages/frontend/dist/
+packages/frontend/.vite/
+
+# Environment files — never commit secrets
+.env
+.env.local
+.env.production
+
+# Prisma
+packages/backend/prisma/migrations/*.sql
+# Keep the migrations directory tracked, but ignore generated client
+packages/backend/node_modules/.prisma/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

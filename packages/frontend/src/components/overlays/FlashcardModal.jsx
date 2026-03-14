@@ -1,0 +1,156 @@
+import { useEffect, useRef } from "react";
+import { Badge } from "../ui/Badge.jsx";
+import { RelatedChip } from "../ui/RelatedChip.jsx";
+import { ChevronBtn } from "../ui/ChevronBtn.jsx";
+import { CAT_MAP, findTermByName } from "../../utils/termLookup.js";
+import { useWindowSize } from "../../hooks/useWindowSize.js";
+
+// Full flashcard overlay.
+// Desktop: centred modal with fixed ChevronBtns.
+// Mobile: bottom sheet with swipe left/right to navigate.
+export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated }) {
+  const word = words[activeIndex];
+  const cat = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: "📖" };
+  const total = words.length;
+  const isMobile = useWindowSize() < 768;
+
+  // Keyboard nav
+  useEffect(() => {
+    const h = e => {
+      if (e.key === "Escape")     onClose();
+      if (e.key === "ArrowLeft")  onPrev();
+      if (e.key === "ArrowRight") onNext();
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [onClose, onPrev, onNext]);
+
+  // Lock scroll
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  // Touch swipe
+  const touchStartX = useRef(null);
+  const handleTouchStart = e => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = e => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 50) { dx < 0 ? onNext() : onPrev(); }
+    touchStartX.current = null;
+  };
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(10,15,30,0.72)", backdropFilter: "blur(8px)", animation: "overlayIn 0.2s ease forwards" }}/>
+      {!isMobile && <ChevronBtn direction="left"  disabled={activeIndex === 0}         onClick={onPrev}/>}
+      {!isMobile && <ChevronBtn direction="right" disabled={activeIndex === total - 1} onClick={onNext}/>}
+
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          position: "fixed", zIndex: 1005, background: "#fff",
+          ...(isMobile ? {
+            left: 0, right: 0, bottom: 0, top: "auto",
+            borderRadius: "20px 20px 0 0", maxHeight: "92vh",
+            transform: "none", width: "100%",
+            animation: "sheetUp 0.32s cubic-bezier(0.32,0.72,0,1)",
+          } : {
+            top: "50%", left: "50%", transform: "translate(-50%,-50%)",
+            width: "min(680px, calc(100vw - 144px))", height: "80vh",
+            borderRadius: 24,
+            animation: "cardIn 0.28s cubic-bezier(0.34,1.56,0.64,1)",
+          }),
+          display: "flex", flexDirection: "column", overflow: "hidden",
+          boxShadow: "0 40px 100px rgba(0,0,0,0.35)",
+        }}
+      >
+        {isMobile && (
+          <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 4px" }}>
+            <div style={{ width: 36, height: 4, borderRadius: 99, background: "#E2E8F0" }}/>
+          </div>
+        )}
+
+        {/* Header */}
+        <div style={{ padding: isMobile ? "16px 20px 16px" : "24px 28px 20px", borderBottom: "1px solid #F1F5F9", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <div style={{ flex: 1, height: 3, background: "#F1F5F9", borderRadius: 99, overflow: "hidden" }}>
+              <div style={{ height: "100%", borderRadius: 99, background: cat.accent, width: `${((activeIndex + 1) / total) * 100}%`, transition: "width 0.3s ease" }}/>
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8", whiteSpace: "nowrap" }}>{activeIndex + 1} / {total}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 18, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 8 }}>{cat.icon}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: cat.accent }}>{word.category}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Badge level={word.level}/>
+              <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+          <h2 style={{ fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1.1, color: "#1A1A2E", fontFamily: "'DM Serif Display', Georgia, serif", margin: 0 }}>
+            {word.term}
+          </h2>
+        </div>
+
+        {/* Scrollable body */}
+        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "28px 28px 24px" }}>
+          <section style={{ marginBottom: 26 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>What it means</p>
+            <p style={{ fontSize: 17, color: "#1A1A2E", lineHeight: 1.72, margin: 0 }}>{word.definition}</p>
+          </section>
+          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 26 }}/>
+          <section style={{ marginBottom: 26 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Why it matters</p>
+            <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
+          </section>
+          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 26 }}/>
+          <section style={{ marginBottom: 26 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>In a real conversation</p>
+            <div style={{ background: "#1A1A2E", borderRadius: 14, padding: "20px 22px", borderLeft: `4px solid ${cat.accent}` }}>
+              <p style={{ fontSize: 15, color: "#E2E8F0", lineHeight: 1.65, margin: 0, fontStyle: "italic" }}>{word.example}</p>
+            </div>
+          </section>
+          {word.related && (
+            <section>
+              <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 12 }}>Related terms</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {word.related.map(r => {
+                  const linked = findTermByName(r);
+                  return (
+                    <RelatedChip
+                      key={r}
+                      label={r}
+                      linked={!!linked}
+                      color={cat.color}
+                      accent={cat.accent}
+                      onClick={linked ? () => onOpenRelated(linked) : undefined}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "14px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#FAFAFA" }}>
+          <button onClick={onPrev} disabled={activeIndex === 0} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 600, color: activeIndex === 0 ? "#CBD5E1" : "#475569", cursor: activeIndex === 0 ? "not-allowed" : "pointer" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>Previous
+          </button>
+          <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 500 }}>
+            {isMobile ? "swipe or tap buttons" : "← → to navigate"}
+          </span>
+          <button onClick={onNext} disabled={activeIndex === total - 1} style={{ display: "flex", alignItems: "center", gap: 6, background: activeIndex === total - 1 ? "#F8FAFC" : "#1A1A2E", border: "none", borderRadius: 8, padding: "9px 18px", fontSize: 13, fontWeight: 600, color: activeIndex === total - 1 ? "#CBD5E1" : "#fff", cursor: activeIndex === total - 1 ? "not-allowed" : "pointer" }}>
+            Next<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
