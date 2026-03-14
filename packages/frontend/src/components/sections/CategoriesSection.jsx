@@ -1,6 +1,5 @@
 import { CategoryCard } from "../cards/CategoryCard.jsx";
 import { FilterPills } from "../ui/FilterPills.jsx";
-import { AdSlot } from "../ui/AdSlot.jsx";
 import { DOMAINS } from "../../data/domains.js";
 import { filterCategories } from "../../utils/filterUtils.js";
 import { CATEGORIES } from "../../data/categories.js";
@@ -28,16 +27,13 @@ export function CategoriesSection({ search, activeDomain, onDomainChange, onOpen
         </div>
         <FilterPills options={DOMAINS} active={activeDomain} onChange={onDomainChange}/>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: 14 }}>
-        {filteredCats.map((cat, i) => {
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: 14, alignItems: "start" }}>
+        {filteredCats.map((cat) => {
           const catWords = user ? ALL_WORDS.filter(w => w.category === cat.name) : [];
           const completedCount = user ? catWords.filter(w => completedTerms.has(w.term)).length : undefined;
           const totalCount     = user ? catWords.length : undefined;
           return (
-          <>
             <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)} completedCount={completedCount} totalCount={totalCount}/>
-            {i === 10 && <AdSlot key="ad-grid" slot="1205581780" variant="grid"/>}
-          </>
           );
         })}
       </div>

@@ -15,6 +15,7 @@ import { useModalState }      from "./hooks/useModalState.js";
 import { useDrawerState }     from "./hooks/useDrawerState.js";
 import { useProgress }        from "./hooks/useProgress.js";
 import { useAuth }            from "./context/AuthContext.jsx";
+import { AdSlot }            from "./components/ui/AdSlot.jsx";
 
 export default function App() {
   const { user }                             = useAuth();
@@ -77,6 +78,7 @@ export default function App() {
             completedTerms={completedTerms}
             user={user}
           />
+          <AdSlot slot="1205581780"/>
           <FeaturedSection
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}

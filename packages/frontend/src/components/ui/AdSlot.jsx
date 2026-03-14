@@ -6,9 +6,8 @@ import { useEffect, useRef } from "react";
 // slot prop: paste the data-ad-slot value from your AdSense dashboard
 //   (Ads > By ad unit > create a "Responsive display ad", copy the slot ID)
 //
-// variant="grid"   — fits inside the category card grid
-// variant="drawer" — fits inside the category drawer word list
-export function AdSlot({ slot = "1205581780", variant = "grid" }) {
+// variant="banner" — full-width horizontal banner between page sections
+export function AdSlot({ slot = "1205581780" }) {
   const insRef = useRef(null);
   const pushed = useRef(false);
 
@@ -22,12 +21,8 @@ export function AdSlot({ slot = "1205581780", variant = "grid" }) {
     }
   }, []);
 
-  const containerStyle = variant === "drawer"
-    ? { borderRadius: 12, overflow: "hidden", minHeight: 80 }
-    : { borderRadius: 14, overflow: "hidden", minHeight: 130 };
-
   return (
-    <div style={containerStyle}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
       <ins
         ref={insRef}
         className="adsbygoogle"

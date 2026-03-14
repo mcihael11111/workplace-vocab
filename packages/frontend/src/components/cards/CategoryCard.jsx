@@ -17,6 +17,7 @@ export function CategoryCard({ cat, onClick, completedCount, totalCount }) {
         background: allDone ? "#F0FDF4" : hov ? "#fff" : "#FAFAFA",
         border: `1.5px solid ${allDone ? "#86EFAC" : hov ? cat.accent : "#E2E8F0"}`,
         borderRadius: 14, padding: "20px 22px", cursor: "pointer",
+        alignSelf: "start",
         transition: "all 0.18s cubic-bezier(0.4,0,0.2,1)",
         transform: hov ? "translateY(-2px)" : "none",
         boxShadow: hov ? "0 8px 24px rgba(0,0,0,0.08)" : "none",
@@ -42,7 +43,7 @@ export function CategoryCard({ cat, onClick, completedCount, totalCount }) {
       <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.5 }}>
         {cat.description}
       </div>
-      {hasProgress && !allDone && (
+      {hasProgress && !allDone && completedCount > 0 && (
         <div style={{ marginTop: 12, height: 3, background: "#E2E8F0", borderRadius: 99, overflow: "hidden" }}>
           <div style={{ height: "100%", borderRadius: 99, background: cat.accent, width: `${pct}%`, transition: "width 0.4s ease" }}/>
         </div>
