@@ -4,9 +4,10 @@ import { AdSlot } from "../ui/AdSlot.jsx";
 import { DOMAINS } from "../../data/domains.js";
 import { filterCategories } from "../../utils/filterUtils.js";
 import { CATEGORIES } from "../../data/categories.js";
+import { ALL_WORDS } from "../../data/words.js";
 
 // Category grid section with domain filter pills and search-driven heading.
-export function CategoriesSection({ search, activeDomain, onDomainChange, onOpenDrawer }) {
+export function CategoriesSection({ search, activeDomain, onDomainChange, onOpenDrawer, completedTerms = new Set() }) {
   const filteredCats = filterCategories(CATEGORIES, activeDomain, search);
 
   return (
@@ -28,12 +29,16 @@ export function CategoriesSection({ search, activeDomain, onDomainChange, onOpen
         <FilterPills options={DOMAINS} active={activeDomain} onChange={onDomainChange}/>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: 14 }}>
-        {filteredCats.map((cat, i) => (
+        {filteredCats.map((cat, i) => {
+          const catWords = ALL_WORDS.filter(w => w.category === cat.name);
+          const completedCount = catWords.filter(w => completedTerms.has(w.term)).length;
+          return (
           <>
-            <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)}/>
+            <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)} completedCount={completedCount} totalCount={catWords.length}/>
             {i === 10 && <AdSlot key="ad-grid" slot="1205581780" variant="grid"/>}
           </>
-        ))}
+          );
+        })}
       </div>
       {search && filteredCats.length === 0 && (
         <div style={{ textAlign: "center", padding: "60px 24px", color: "#94A3B8" }}>

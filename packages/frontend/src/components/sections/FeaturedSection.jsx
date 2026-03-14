@@ -12,7 +12,7 @@ const LEVEL_OPTIONS = [
 
 // Featured flashcards grid with level filter.
 // onOpenModal(words, index) is called when a card is clicked.
-export function FeaturedSection({ activeFilter, onFilterChange, onOpenModal }) {
+export function FeaturedSection({ activeFilter, onFilterChange, onOpenModal, completedTerms = new Set() }) {
   const filteredFeatured = filterByLevel(FEATURED_WORDS, activeFilter);
 
   return (
@@ -29,7 +29,7 @@ export function FeaturedSection({ activeFilter, onFilterChange, onOpenModal }) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))", gap: 16 }}>
         {filteredFeatured.map((word, i) => (
-          <GridCard key={word.term} word={word} onOpen={() => onOpenModal(filteredFeatured, i)}/>
+          <GridCard key={word.term} word={word} onOpen={() => onOpenModal(filteredFeatured, i)} isDone={completedTerms.has(word.term)}/>
         ))}
       </div>
       <p style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#94A3B8" }}>

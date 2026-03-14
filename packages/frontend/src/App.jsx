@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SiteNav }            from "./components/layout/SiteNav.jsx";
 import { Footer }             from "./components/layout/Footer.jsx";
 import { HeroSection }        from "./components/sections/HeroSection.jsx";
+import { WelcomeStrip }       from "./components/sections/WelcomeStrip.jsx";
 import { CategoriesSection }  from "./components/sections/CategoriesSection.jsx";
 import { FeaturedSection }    from "./components/sections/FeaturedSection.jsx";
 import { CtaSection }         from "./components/sections/CtaSection.jsx";
@@ -60,17 +61,26 @@ export default function App() {
       ) : (
         <>
           <HeroSection search={search} onSearchChange={setSearch}/>
+          {user && (
+            <WelcomeStrip
+              user={user}
+              completedTerms={completedTerms}
+              onResume={openModal}
+            />
+          )}
           <Ticker/>
           <CategoriesSection
             search={search}
             activeDomain={activeDomain}
             onDomainChange={setActiveDomain}
             onOpenDrawer={openDrawer}
+            completedTerms={completedTerms}
           />
           <FeaturedSection
             activeFilter={activeFilter}
             onFilterChange={setActiveFilter}
             onOpenModal={openModal}
+            completedTerms={completedTerms}
           />
           <CtaSection onOpenLogin={openLogin}/>
           <Footer/>
