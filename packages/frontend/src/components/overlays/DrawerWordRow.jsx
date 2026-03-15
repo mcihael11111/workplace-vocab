@@ -5,18 +5,29 @@ import { Badge } from "../ui/Badge.jsx";
 // Clicking opens the FlashcardModal at this term's index via onOpen.
 export function DrawerWordRow({ word, cat, onOpen }) {
   const [hov, setHov] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   return (
     <div
       onClick={onOpen}
       onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      onMouseLeave={() => { setHov(false); setPressed(false); }}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === "Enter" && onOpen?.()}
+      aria-label={`Open flashcard for ${word.term}`}
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "16px 18px", borderRadius: 12,
+        padding: "16px 18px", borderRadius: 12, minHeight: 44,
         border: `1.5px solid ${hov ? cat.accent : "#F1F5F9"}`,
-        background: hov ? cat.color : "#FAFAFA",
-        cursor: "pointer", transition: "all 0.15s", gap: 12,
+        background: pressed ? cat.color : hov ? cat.color : "#FAFAFA",
+        cursor: "pointer",
+        transition: "border-color 0.15s, background 0.15s, transform 0.1s",
+        transform: pressed ? "scale(0.98)" : "none",
+        gap: 12, outline: "none",
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -29,8 +40,8 @@ export function DrawerWordRow({ word, cat, onOpen }) {
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
         <Badge level={word.level}/>
-        <div style={{ width: 30, height: 30, borderRadius: 8, background: hov ? cat.accent : "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={hov ? "#fff" : "#94A3B8"} strokeWidth="2.5">
+        <div style={{ width: 30, height: 44, borderRadius: 8, background: (hov || pressed) ? cat.accent : "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={(hov || pressed) ? "#fff" : "#94A3B8"} strokeWidth="2.5">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
         </div>

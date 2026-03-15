@@ -8,7 +8,7 @@ const NAV_LINKS = [
 ];
 
 // Sticky top nav. Shows user avatar + progress link when logged in.
-export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut }) {
+export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingOut }) {
   const isMobile  = useWindowSize() < 768;
   const [menuOpen, setMenuOpen]       = useState(false);
   const [dropOpen, setDropOpen]       = useState(false);
@@ -58,12 +58,13 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut }) {
             <div style={{ height: 1, background: "#F1F5F9", margin: "4px 0" }}/>
             <button
               onClick={() => { setDropOpen(false); onSignOut(); }}
-              style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 8, background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 500, color: "#64748B", textAlign: "left" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#F8FAFC"}
+              disabled={signingOut}
+              style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 8, background: "none", border: "none", cursor: signingOut ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 500, color: signingOut ? "#94A3B8" : "#64748B", textAlign: "left" }}
+              onMouseEnter={e => { if (!signingOut) e.currentTarget.style.background = "#F8FAFC"; }}
               onMouseLeave={e => e.currentTarget.style.background = "none"}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-              Sign out
+              {signingOut ? "Signing out…" : "Sign out"}
             </button>
           </div>
         </>
@@ -104,8 +105,8 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut }) {
                   <button onClick={() => { setMenuOpen(false); onOpenProgress(); }} style={{ background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 8, padding: "12px 16px", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>
                     My Progress
                   </button>
-                  <button onClick={() => { setMenuOpen(false); onSignOut(); }} style={{ background: "none", color: "#64748B", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "11px 16px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-                    Sign out
+                  <button onClick={() => { setMenuOpen(false); onSignOut(); }} disabled={signingOut} style={{ background: "none", color: signingOut ? "#94A3B8" : "#64748B", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "11px 16px", fontSize: 14, fontWeight: 600, cursor: signingOut ? "not-allowed" : "pointer" }}>
+                    {signingOut ? "Signing out…" : "Sign out"}
                   </button>
                 </>
               ) : (

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: workplace-vocab-api
+    runtime: node
+    rootDir: packages/backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        value: https://workvocab.com
+      - key: STRIPE_PRICE_ID
+        value: price_1TB5MQDEbaRafede9FkK0Qdl
+      - key: FIREBASE_PROJECT_ID
+        value: workplace-vocab
+      # Set these manually in the Render dashboard (sensitive):
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false

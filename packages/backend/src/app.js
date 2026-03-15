@@ -9,7 +9,12 @@ const app = express();
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(corsMiddleware);
-app.use(express.json());
+// Skip express.json() for the Stripe webhook — it needs the raw body for signature verification.
+// The webhook route mounts its own express.raw() parser.
+app.use((req, res, next) => {
+  if (req.originalUrl === "/api/v1/payments/webhook") return next();
+  express.json()(req, res, next);
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
