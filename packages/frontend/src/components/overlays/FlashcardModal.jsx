@@ -35,13 +35,11 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
   // Keyboard nav (desktop)
   useEffect(() => {
     const h = e => {
-      if (e.key === "Escape")     onClose();
-      if (e.key === "ArrowLeft")  onPrev();
-      if (e.key === "ArrowRight") onNext();
+      if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [onClose, onPrev, onNext]);
+  }, [onClose]);
 
   // Lock scroll on body
   useEffect(() => {
@@ -96,8 +94,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
         onClick={onClose}
         style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(10,15,30,0.72)", backdropFilter: "blur(8px)", animation: "overlayIn 0.2s ease forwards" }}
       />
-      {!isMobile && <ChevronBtn direction="left"  disabled={activeIndex === 0}         onClick={onPrev}/>}
-      {!isMobile && <ChevronBtn direction="right" disabled={activeIndex === total - 1} onClick={onNext}/>}
+
 
       <div
         onTouchStart={handleTouchStart}
@@ -299,46 +296,19 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
           </div>
         )}
 
-        {/* ── Footer ───────────────────────────────────────────────────────
-            Mobile: icon-only prev/next (swipe handles navigation).
-            All buttons ≥ 44px tall (WCAG 2.5.5).                         */}
-        <div style={{ padding: isMobile ? "10px 16px" : "14px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#FAFAFA", gap: 8 }}>
-
-          {/* Prev */}
-          <button
-            onClick={onPrev}
-            disabled={activeIndex === 0}
-            aria-label="Previous card"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "none", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: isMobile ? "0 14px" : "0 16px", height: 44, minWidth: 44, fontSize: 13, fontWeight: 600, color: activeIndex === 0 ? "#CBD5E1" : "#475569", cursor: activeIndex === 0 ? "not-allowed" : "pointer" }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-            {!isMobile && "Previous"}
-          </button>
-
-          {/* Mark done */}
-          {user && (
+        {/* ── Footer ─────────────────────────────────────────────────────── */}
+        {user && (
+          <div style={{ padding: isMobile ? "10px 16px" : "14px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "center", alignItems: "center", flexShrink: 0, background: "#FAFAFA" }}>
             <button
               onClick={() => onToggleComplete(word.term)}
               aria-label={isDone ? "Mark as not done" : "Mark as done"}
-              style={{ display: "flex", alignItems: "center", gap: 6, border: `1.5px solid ${isDone ? "#22C55E" : "#E2E8F0"}`, borderRadius: 8, padding: "0 14px", height: 44, fontSize: 13, fontWeight: 600, cursor: "pointer", background: isDone ? "#F0FDF4" : "#fff", color: isDone ? "#16A34A" : "#64748B", transition: "all 0.15s", whiteSpace: "nowrap" }}
+              style={{ display: "flex", alignItems: "center", gap: 6, border: `1.5px solid ${isDone ? "#22C55E" : "#E2E8F0"}`, borderRadius: 8, padding: "0 20px", height: 44, fontSize: 13, fontWeight: 600, cursor: "pointer", background: isDone ? "#F0FDF4" : "#fff", color: isDone ? "#16A34A" : "#64748B", transition: "all 0.15s", whiteSpace: "nowrap" }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
               {isDone ? "Completed" : "Mark done"}
             </button>
-          )}
-
-          {/* Next */}
-          <button
-            onClick={onNext}
-            disabled={activeIndex === total - 1}
-            aria-label="Next card"
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: activeIndex === total - 1 ? "#F8FAFC" : "#1A1A2E", border: "none", borderRadius: 8, padding: isMobile ? "0 14px" : "0 18px", height: 44, minWidth: 44, fontSize: 13, fontWeight: 600, color: activeIndex === total - 1 ? "#CBD5E1" : "#fff", cursor: activeIndex === total - 1 ? "not-allowed" : "pointer" }}
-          >
-            {!isMobile && "Next"}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
-
-        </div>
+          </div>
+        )}
       </div>
     </>
   );
