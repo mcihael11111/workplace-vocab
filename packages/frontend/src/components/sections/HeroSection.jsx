@@ -1,7 +1,6 @@
-import { SearchBar } from "../ui/SearchBar.jsx";
 import { STATS } from "../../data/domains.js";
 
-export function HeroSection({ search, onSearchChange }) {
+export function HeroSection() {
   return (
     <section
       id="hero"
@@ -24,14 +23,10 @@ export function HeroSection({ search, onSearchChange }) {
 
       <p
         className="fade-up"
-        style={{ animationDelay: "160ms", fontSize: 16, color: "#475569", lineHeight: 1.6, maxWidth: 480, margin: "0 auto 28px", fontWeight: 400 }}
+        style={{ animationDelay: "160ms", fontSize: 16, color: "#475569", lineHeight: 1.6, maxWidth: 480, margin: "0 auto", fontWeight: 400 }}
       >
         Learn the language of design, product, and business — one term at a time.
       </p>
-
-      <div className="fade-up" style={{ animationDelay: "240ms", display: "flex", justifyContent: "center" }}>
-        <SearchBar value={search} onChange={onSearchChange}/>
-      </div>
     </section>
   );
 }

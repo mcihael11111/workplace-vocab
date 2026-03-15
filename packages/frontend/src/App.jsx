@@ -143,7 +143,7 @@ export default function App() {
         />
       ) : (
         <>
-          <HeroSection search={search} onSearchChange={setSearch}/>
+          <HeroSection/>
           <TermOfTheDay completedTerms={completedTerms} onOpen={openModal}/>
           {user && (
             <WelcomeStrip
