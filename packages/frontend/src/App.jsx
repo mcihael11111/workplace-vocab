@@ -20,6 +20,10 @@ import { CATEGORIES }         from "./data/categories.js";
 import { AdSlot }            from "./components/ui/AdSlot.jsx";
 import { TermOfTheDay }     from "./components/ui/TermOfTheDay.jsx";
 
+// Stable for the lifetime of the session — term changes at midnight
+const DAILY_TERM_NAME = ALL_WORDS[Math.floor(Date.now() / 86400000) % ALL_WORDS.length]?.term;
+const DAILY_UNLOCKED  = new Set(DAILY_TERM_NAME ? [DAILY_TERM_NAME] : []);
+
 export default function App() {
   const { user, signOut, isPro }             = useAuth();
 
@@ -199,6 +203,7 @@ export default function App() {
           user={user}
           completedTerms={completedTerms}
           onToggleComplete={toggleComplete}
+          unlockedTerms={DAILY_UNLOCKED}
         />
       )}
 

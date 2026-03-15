@@ -8,9 +8,9 @@ import { useWindowSize } from "../../hooks/useWindowSize.js";
 // Full flashcard overlay.
 // Desktop: centred modal with fixed ChevronBtns.
 // Mobile: bottom sheet with swipe left/right to navigate.
-export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, user, completedTerms = new Set(), onToggleComplete }) {
+export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, unlockedTerms, user, completedTerms = new Set(), onToggleComplete }) {
   const word   = words[activeIndex];
-  const locked = isPro ? false : isTermLocked(word.term);
+  const locked = isPro || unlockedTerms?.has(word.term) ? false : isTermLocked(word.term);
   const cat    = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: "📖" };
   const isDone = completedTerms.has(word.term);
   const total = words.length;
@@ -137,12 +137,12 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
           </div>
         ) : (
         <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "24px 24px 24px" }}>
-          <section style={{ marginBottom: 26 }}>
+          <section style={{ marginBottom: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>What it means</p>
             <p style={{ fontSize: 16, color: "#1A1A2E", lineHeight: 1.72, margin: 0 }}>{word.definition}</p>
           </section>
-          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 26 }}/>
-          <section style={{ marginBottom: 26 }}>
+          <div style={{ height: 1, background: "#F1F5F9", marginBottom: 16 }}/>
+          <section style={{ marginBottom: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Why it matters</p>
             <p style={{ fontSize: 16, color: "#1E293B", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
           </section>
@@ -161,7 +161,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
             </div>
           </section>
           <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
-          <section style={{ marginBottom: 26, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
+          <section style={{ marginBottom: 16, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
             <button onClick={() => setConversationOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: conversationOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "12px 16px", cursor: "pointer" }}>
               <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>In a real conversation</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
