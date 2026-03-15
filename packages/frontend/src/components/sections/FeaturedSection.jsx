@@ -2,7 +2,6 @@ import { GridCard } from "../cards/GridCard.jsx";
 import { FilterPills } from "../ui/FilterPills.jsx";
 import { FEATURED_WORDS } from "../../data/featured.js";
 import { filterByLevel } from "../../utils/filterUtils.js";
-
 const LEVEL_OPTIONS = [
   { id: "All",          name: "All" },
   { id: "Beginner",     name: "Beginner" },

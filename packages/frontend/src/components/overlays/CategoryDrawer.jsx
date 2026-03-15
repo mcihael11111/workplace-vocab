@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { ALL_WORDS } from "../../data/words.js";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { DrawerWordRow } from "./DrawerWordRow.jsx";
-
 // Right-side panel (desktop) / bottom sheet (mobile) showing all terms in a category.
 // onOpenCard(words, index) — called when a term row is clicked.
 export function CategoryDrawer({ cat, onClose, onOpenCard }) {

@@ -11,9 +11,10 @@ import { useWindowSize } from "../../hooks/useWindowSize.js";
 //   - Swipe left/right on body → prev/next (Y-axis guarded to avoid false triggers)
 //   - Drag handle + compact sticky header (when scrolled) → swipe down → close
 //   - All touch targets ≥ 44×44px (WCAG 2.5.5)
-export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, unlockedTerms, user, completedTerms = new Set(), onToggleComplete }) {
+export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, unlockedTerms, viewedTerms = new Set(), isViewLimitReached = false, onView, user, completedTerms = new Set(), onToggleComplete }) {
   const word   = words[activeIndex];
-  const locked = isPro || unlockedTerms?.has(word.term) ? false : isTermLocked(word.term);
+  // Locked if: not Pro, limit reached, term never viewed before, and not the daily term override
+  const locked = !isPro && isViewLimitReached && !viewedTerms.has(word.term) && !unlockedTerms?.has(word.term);
   const cat    = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: "📖" };
   const isDone = completedTerms.has(word.term);
   const total  = words.length;
@@ -27,6 +28,8 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
     setScenarioOpen(false);
     setConversationOpen(false);
     setBodyScrolled(false);
+    // Track this view — only first open counts, re-views are free
+    if (!locked) onView?.(word.term);
   }, [activeIndex]);
 
   // Keyboard nav (desktop)
@@ -217,8 +220,8 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
                 </svg>
               </div>
               <div>
-                <p style={{ fontSize: 17, fontWeight: 700, color: "#1A1A2E", margin: "0 0 6px", fontFamily: "'DM Serif Display', serif" }}>This card is locked</p>
-                <p style={{ fontSize: 14, color: "#64748B", margin: 0, lineHeight: 1.55 }}>Upgrade to Pro to unlock all 200+ terms<br/>across every category.</p>
+                <p style={{ fontSize: 17, fontWeight: 700, color: "#1A1A2E", margin: "0 0 6px", fontFamily: "'DM Serif Display', serif" }}>You've read your 9 free cards</p>
+                <p style={{ fontSize: 14, color: "#64748B", margin: 0, lineHeight: 1.55 }}>Upgrade to Pro to unlock all 200+ terms<br/>and keep your streak going.</p>
               </div>
               <button
                 onClick={onUpgrade}
