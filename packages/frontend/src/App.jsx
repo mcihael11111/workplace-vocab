@@ -11,7 +11,7 @@ import { Ticker }             from "./components/ui/Ticker.jsx";
 import { CategoryDrawer }     from "./components/overlays/CategoryDrawer.jsx";
 import { FlashcardModal }     from "./components/overlays/FlashcardModal.jsx";
 import { LoginModal }         from "./components/overlays/LoginModal.jsx";
-import { Confetti }           from "./components/ui/Confetti.jsx";
+import { MilestoneSheet }     from "./components/overlays/MilestoneSheet.jsx";
 import { useModalState }      from "./hooks/useModalState.js";
 import { useDrawerState }     from "./hooks/useDrawerState.js";
 import { useProgress }        from "./hooks/useProgress.js";
@@ -27,12 +27,11 @@ const DAILY_UNLOCKED  = new Set(DAILY_TERM_NAME ? [DAILY_TERM_NAME] : []);
 
 export default function App() {
   const { user, signOut, isPro } = useAuth();
-  const [confetti,     setConfetti]     = useState(false);
+  const [milestone,    setMilestone]    = useState(null);
 
   const handleMilestone = ({ type, streakDays, days }) => {
     if (type === "confetti") {
-      setConfetti(true);
-      showToast({ message: "You've opened 3 cards! 🎉 Keep going" });
+      setMilestone(3);
     } else if (type === "dailyGoal") {
       showToast({ message: `Daily goal hit! 🔥 ${streakDays > 1 ? `${streakDays}-day streak` : "Keep it up"}` });
     } else if (type === "streak") {
@@ -210,8 +209,8 @@ export default function App() {
       {/* Login modal */}
       {loginOpen && <LoginModal onClose={() => setLoginOpen(false)}/>}
 
-      {/* Confetti celebration */}
-      {confetti && <Confetti onDone={() => setConfetti(false)}/>}
+      {/* Milestone achievement sheet */}
+      {milestone !== null && <MilestoneSheet currentCount={milestone} onClose={() => setMilestone(null)}/>}
 
       {/* Toast */}
       {toast && (
