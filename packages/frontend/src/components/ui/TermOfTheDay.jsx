@@ -1,4 +1,4 @@
-// TermOfTheDay — compact featured strip below the hero.
+// TermOfTheDay — featured strip below the hero, matching the CategoriesSection header pattern.
 // Picks one term per calendar day deterministically — no backend needed.
 // Category accent, icon, and name update daily with the term.
 import { ALL_WORDS } from "../../data/words.js";
@@ -20,61 +20,60 @@ export function TermOfTheDay({ completedTerms, onOpen }) {
     onOpen(wordsInCat, idx >= 0 ? idx : 0);
   };
 
-  // Short teaser — up to first comma/period or 90 chars
+  // Short teaser — up to first comma/period or 100 chars
   const teaser = (() => {
     const cutoff = term.definition.search(/[,.]/);
-    const short  = cutoff > 0 && cutoff < 90 ? term.definition.slice(0, cutoff) : term.definition.slice(0, 90);
-    return short + "…";
+    const short  = cutoff > 0 && cutoff < 100 ? term.definition.slice(0, cutoff) : term.definition.slice(0, 100);
+    return short + ".";
   })();
 
   return (
-    <div style={{ background: "#1A1A2E" }}>
+    <div style={{ borderBottom: "1px solid #F1F5F9" }}>
       <div style={{
-        maxWidth: 900, margin: "0 auto", padding: "14px 24px",
-        display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
+        maxWidth: 1200, margin: "0 auto", padding: "20px 24px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        gap: 24, flexWrap: "wrap",
       }}>
 
-        {/* Label + category */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
-            Word of the day
-          </span>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(255,255,255,0.08)", borderRadius: 99, padding: "3px 10px 3px 6px" }}>
-            <span style={{ fontSize: 12 }}>{cat.icon}</span>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: cat.accent }}>{cat.name}</span>
+        {/* Left: label + term */}
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#94A3B8", margin: 0 }}>
+              Word of the day
+            </p>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: cat.color, borderRadius: 99, padding: "2px 8px 2px 5px" }}>
+              <span style={{ fontSize: 11 }}>{cat.icon}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: cat.accent }}>{cat.name}</span>
+            </div>
           </div>
-        </div>
-
-        {/* Divider */}
-        <div style={{ width: 1, height: 24, background: "rgba(255,255,255,0.12)", flexShrink: 0 }}/>
-
-        {/* Term + teaser */}
-        <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.02em", fontFamily: "'DM Serif Display', Georgia, serif", color: "#fff", whiteSpace: "nowrap" }}>
+          <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", fontFamily: "'DM Serif Display', serif", color: "#1A1A2E", margin: 0 }}>
             {term.term}
-          </span>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>
-            {teaser}
-          </span>
+          </h2>
         </div>
 
-        {/* CTA */}
-        {isDone ? (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#4ADE80", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-            Done today
-          </div>
-        ) : (
-          <button
-            onClick={handleOpen}
-            style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#fff", color: "#1A1A2E", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, transition: "opacity 0.15s" }}
-            onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
-            onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-          >
-            Open card
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        )}
+        {/* Right: teaser + CTA */}
+        <div style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+          <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.55, maxWidth: 360, margin: 0 }}>
+            {teaser}
+          </p>
+          {isDone ? (
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#F0FDF4", border: "1.5px solid #86EFAC", borderRadius: 8, padding: "9px 16px", fontSize: 13, fontWeight: 700, color: "#16A34A", whiteSpace: "nowrap" }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+              Done today
+            </div>
+          ) : (
+            <button
+              onClick={handleOpen}
+              aria-label={`Open flashcard for ${term.term}`}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 8, padding: "10px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap", transition: "opacity 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
+              onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+            >
+              Open card
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          )}
+        </div>
 
       </div>
     </div>
