@@ -2,14 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { Badge } from "../ui/Badge.jsx";
 import { RelatedChip } from "../ui/RelatedChip.jsx";
 import { ChevronBtn } from "../ui/ChevronBtn.jsx";
-import { CAT_MAP, findTermByName } from "../../utils/termLookup.js";
+import { CAT_MAP, findTermByName, isTermLocked } from "../../utils/termLookup.js";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 
 // Full flashcard overlay.
 // Desktop: centred modal with fixed ChevronBtns.
 // Mobile: bottom sheet with swipe left/right to navigate.
-export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, user, completedTerms = new Set(), onToggleComplete }) {
+export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, user, completedTerms = new Set(), onToggleComplete }) {
   const word   = words[activeIndex];
+  const locked = isPro ? false : isTermLocked(word.term);
   const cat    = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: "📖" };
   const isDone = completedTerms.has(word.term);
   const total = words.length;
@@ -108,15 +109,42 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
         </div>
 
         {/* Scrollable body */}
-        <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "28px 28px 24px" }}>
+        {locked ? (
+          <div ref={scrollRef} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: isMobile ? "32px 24px" : "40px 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+            {/* blurred ghost content */}
+            <div style={{ position: "absolute", inset: 0, padding: isMobile ? "20px 20px 24px" : "28px 28px 24px", filter: "blur(8px)", opacity: 0.35, userSelect: "none", pointerEvents: "none" }}>
+              <p style={{ fontSize: 17, color: "#1A1A2E", lineHeight: 1.72, marginBottom: 24 }}>{word.definition}</p>
+              <p style={{ fontSize: 15, color: "#1E293B", lineHeight: 1.72 }}>{word.whyItMatters}</p>
+            </div>
+            {/* lock CTA */}
+            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 16, background: "#EDE9FE", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <div>
+                <p style={{ fontSize: 17, fontWeight: 700, color: "#1A1A2E", margin: "0 0 6px", fontFamily: "'DM Serif Display', serif" }}>This card is locked</p>
+                <p style={{ fontSize: 14, color: "#64748B", margin: 0, lineHeight: 1.55 }}>Upgrade to Pro to unlock all 200+ terms<br/>across every category.</p>
+              </div>
+              <button
+                onClick={onUpgrade}
+                style={{ background: "#7C3AED", color: "#fff", border: "none", borderRadius: 10, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: "0.01em" }}
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+        ) : (
+        <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "24px 24px 24px" }}>
           <section style={{ marginBottom: 26 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>What it means</p>
-            <p style={{ fontSize: 17, color: "#1A1A2E", lineHeight: 1.72, margin: 0 }}>{word.definition}</p>
+            <p style={{ fontSize: 16, color: "#1A1A2E", lineHeight: 1.72, margin: 0 }}>{word.definition}</p>
           </section>
           <div style={{ height: 1, background: "#F1F5F9", marginBottom: 26 }}/>
           <section style={{ marginBottom: 26 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Why it matters</p>
-            <p style={{ fontSize: 15, color: "#1E293B", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
+            <p style={{ fontSize: 16, color: "#1E293B", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
           </section>
           <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
           <section style={{ marginBottom: 12, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
@@ -167,6 +195,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
             </section>
           )}
         </div>
+        )}
 
         {/* Footer */}
         <div style={{ padding: "14px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0, background: "#FAFAFA", gap: 8 }}>
