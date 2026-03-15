@@ -1,10 +1,6 @@
-// TermOfTheDay — full-width section placed directly below the hero.
+// TermOfTheDay — compact horizontal card below the hero.
 // Picks one term per calendar day deterministically — no backend needed.
-// The category accent colour, icon, and name all update with the term.
-//
-// Props:
-//   completedTerms — Set<string>
-//   onOpen         — (words: Word[], index: number) => void
+// Category accent, icon, and name update daily with the term.
 import { ALL_WORDS } from "../../data/words.js";
 import { CAT_MAP } from "../../utils/termLookup.js";
 
@@ -24,60 +20,63 @@ export function TermOfTheDay({ completedTerms, onOpen }) {
     onOpen(wordsInCat, idx >= 0 ? idx : 0);
   };
 
-  // Teaser: first sentence of definition, max 120 chars
-  const teaser = term.definition.length > 120
-    ? term.definition.slice(0, term.definition.lastIndexOf(" ", 120)) + "…"
-    : term.definition;
+  // Short teaser — first clause only
+  const teaser = (() => {
+    const cutoff = term.definition.search(/[,\.]/);
+    const short  = cutoff > 0 && cutoff < 100 ? term.definition.slice(0, cutoff) : term.definition.slice(0, 80);
+    return short + "…";
+  })();
 
   return (
-    <section style={{ borderTop: "1px solid #F1F5F9", borderBottom: "1px solid #F1F5F9", background: "#FAFAFA" }}>
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 24px 40px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 20 }}>
+    <div style={{ borderTop: "1px solid #F1F5F9", borderBottom: "1px solid #F1F5F9", background: "#FAFAFA" }}>
+      <div style={{
+        maxWidth: 900, margin: "0 auto", padding: "16px 24px",
+        display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+      }}>
 
-        {/* Label */}
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: cat.color, border: `1px solid ${cat.accent}22`, borderRadius: 99, padding: "5px 14px" }}>
-          <span style={{ fontSize: 14 }}>{cat.icon}</span>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: cat.accent }}>
-            Today's term · {cat.name}
+        {/* Left: label + category chip */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#94A3B8" }}>
+            Today
+          </span>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 5, background: cat.color, borderRadius: 99, padding: "3px 10px 3px 6px" }}>
+            <span style={{ fontSize: 13 }}>{cat.icon}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: cat.accent }}>{cat.name}</span>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: 1, height: 28, background: "#E2E8F0", flexShrink: 0 }}/>
+
+        {/* Term + teaser */}
+        <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.02em", fontFamily: "'DM Serif Display', Georgia, serif", color: "#1A1A2E", whiteSpace: "nowrap" }}>
+            {term.term}
+          </span>
+          <span style={{ fontSize: 13, color: "#94A3B8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "100%" }}>
+            {teaser}
           </span>
         </div>
 
-        {/* Term */}
-        <h2 style={{ fontSize: "clamp(32px, 5vw, 56px)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1.1, fontFamily: "'DM Serif Display', Georgia, serif", color: "#1A1A2E", margin: 0 }}>
-          {term.term}
-        </h2>
-
-        {/* Teaser */}
-        <p style={{ fontSize: 16, color: "#64748B", lineHeight: 1.65, maxWidth: 520, margin: 0 }}>
-          {teaser}
-        </p>
-
         {/* CTA */}
         {isDone ? (
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#F0FDF4", border: "1.5px solid #86EFAC", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, color: "#16A34A" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-            Done for today — come back tomorrow
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#16A34A", fontSize: 13, fontWeight: 600, flexShrink: 0 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            Done today
           </div>
         ) : (
           <button
             onClick={handleOpen}
-            style={{ display: "inline-flex", alignItems: "center", gap: 8, background: cat.accent, color: "#fff", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: "0.01em", transition: "opacity 0.15s" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, background: cat.accent, color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0, transition: "opacity 0.15s" }}
             onMouseEnter={e => e.currentTarget.style.opacity = "0.88"}
             onMouseLeave={e => e.currentTarget.style.opacity = "1"}
           >
-            Open today's card
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Open card
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         )}
 
-        {/* Scroll cue */}
-        <div style={{ marginTop: 4, display: "flex", flexDirection: "column", alignItems: "center", gap: 4, opacity: 0.35 }}>
-          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "#94A3B8" }}>Scroll to explore</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 9l6 6 6-6"/>
-          </svg>
-        </div>
-
       </div>
-    </section>
+    </div>
   );
 }
