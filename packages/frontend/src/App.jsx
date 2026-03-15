@@ -18,6 +18,7 @@ import { useAuth }            from "./context/AuthContext.jsx";
 import { ALL_WORDS }          from "./data/words.js";
 import { CATEGORIES }         from "./data/categories.js";
 import { AdSlot }            from "./components/ui/AdSlot.jsx";
+import { TermOfTheDay }     from "./components/ui/TermOfTheDay.jsx";
 
 export default function App() {
   const { user, signOut, isPro }             = useAuth();
@@ -139,6 +140,7 @@ export default function App() {
       ) : (
         <>
           <HeroSection search={search} onSearchChange={setSearch}/>
+          <TermOfTheDay completedTerms={completedTerms} onOpen={openModal}/>
           {user && (
             <WelcomeStrip
               user={user}
