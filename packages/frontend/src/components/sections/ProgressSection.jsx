@@ -77,7 +77,7 @@ export function ProgressSection({ completedTerms, toggleComplete, onGoHome, onOp
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                       <span style={{ fontWeight: 700, fontSize: 15, color: "#1A1A2E", letterSpacing: "-0.01em" }}>{cat.name}</span>
                       {allDone && (
-                        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 99, padding: "2px 8px" }}>Complete</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 99, padding: "2px 8px", display: "inline-flex", alignItems: "center", gap: 4 }}>🏆 Complete</span>
                       )}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

@@ -28,8 +28,8 @@ export function CategoryCard({ cat, onClick, completedCount, totalCount }) {
           {cat.icon}
         </span>
         {allDone ? (
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#16A34A", background: "#DCFCE7", border: "1px solid #86EFAC", padding: "3px 9px", borderRadius: 99 }}>
-            Complete
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#16A34A", background: "#DCFCE7", border: "1px solid #86EFAC", padding: "3px 9px", borderRadius: 99, display: "flex", alignItems: "center", gap: 4 }}>
+            🏆 Complete
           </span>
         ) : (
           <span style={{ fontSize: 12, fontWeight: 600, color: hov ? cat.accent : "#94A3B8", background: hov ? cat.color : "transparent", padding: "3px 9px", borderRadius: 99, transition: "all 0.18s" }}>
