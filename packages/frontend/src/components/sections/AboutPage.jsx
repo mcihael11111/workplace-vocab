@@ -26,7 +26,7 @@ export function AboutPage({ onOpenLogin }) {
           <span style={{ fontStyle: "italic", color: "#6366F1" }}>unlocks leadership.</span>
         </h1>
         <p style={{ fontSize: 18, color: "#475569", lineHeight: 1.75, marginBottom: 64, maxWidth: 620 }}>
-          In most workplaces, there's an unspoken language. Words like "north star metric," "design system," "unit economics," or "scope creep" get thrown around in meetings as if everyone just knows what they mean. Most people don't — but few will say so. You nod along, you Google it later, and the cycle repeats.
+          You know that thing where someone says "north star metric" or "unit economics" in a meeting and everyone nods? And you nod too, but you're already planning to Google it the second you get back to your desk? Yeah. That's the thing this is for.
         </p>
 
         <Divider/>
@@ -34,10 +34,10 @@ export function AboutPage({ onOpenLogin }) {
         {/* Why it exists */}
         <Section label="Why it exists">
           <p>
-            That gap between the language people use and the language people understand is real, and it costs people confidence, clarity, and career momentum. It's not a sign that someone isn't capable — it's a sign that the vocabulary was never properly taught. Most of it exists inside industries, disciplines, and teams, passed around informally and assumed to be common knowledge.
+            There's a whole layer of language at work that nobody actually teaches you. You're just expected to pick it up — from meetings, from Slack, from overhearing someone say "let's circle back on the OKRs" like that's a normal sentence. And when you don't know a term, it's awkward to ask. So you don't. And the gap quietly grows.
           </p>
           <p>
-            Workplace Vocab was built to close that gap. Not with jargon-heavy textbooks or hour-long courses — but with short, clear, honest explanations of the terms that actually come up in the rooms where decisions get made.
+            That's what Workplace Vocab is here to fix. No textbooks, no hour-long courses. Just clear, honest explanations of the words that actually come up at work — the ones that make you sound like you know what you're talking about (because you will).
           </p>
         </Section>
 
@@ -46,43 +46,43 @@ export function AboutPage({ onOpenLogin }) {
         {/* Who it's for */}
         <Section label="Who it's for">
           <p>
-            This isn't a resource just for designers, or just for developers, or just for people who've been working in tech for a decade. It's for anyone who works in a modern organisation and wants to show up to conversations with more confidence.
+            Honestly? Pretty much anyone with a job. But especially:
           </p>
           <p>
-            The graduate joining their first product team and trying to keep up in stand-ups. The marketer who's started working alongside engineers and keeps hearing terms they can't quite place. The operations lead sitting in cross-functional meetings where half the language sounds like a different dialect. The founder who wants to communicate more precisely with each part of their team. The senior professional who has moved into a new industry and is rebuilding their context from scratch.
+            You just landed your first role on a product team and stand-ups feel like a foreign language. Or you're a marketer who's suddenly working with engineers and half the words in their Jira tickets might as well be in code. Maybe you're running a startup and you want to talk to every part of your team without sounding like you're bluffing. Or you've switched industries and you're rebuilding your vocabulary from scratch — even though you've got ten years of experience.
           </p>
           <p>
-            If you've ever walked out of a meeting thinking "I should know what that means" — this was built for you.
+            If you've ever walked out of a meeting thinking "I really should know what that means" — welcome. You're in the right place.
           </p>
         </Section>
 
         <Divider/>
 
         {/* The content */}
-        <Section label="The content">
+        <Section label="What you'll find here">
           <p>
-            Every term in Workplace Vocab has been chosen because it comes up in real working environments — in strategy sessions, sprint reviews, stakeholder presentations, product critiques, and hiring conversations. Not theoretical, not academic. The kind of language that moves careers.
+            Every term here was picked because it actually comes up — in sprint reviews, strategy meetings, stakeholder decks, product critiques, job interviews. Nothing theoretical. Nothing you'd only find in a textbook. Just the language that shows up when real work is happening.
           </p>
           <p>
-            Each entry goes beyond a one-line definition. You get the plain-language meaning, the reason it matters in a professional context, a real-world example of how it shows up in conversation, and related terms that help you build a connected understanding rather than a list of isolated facts. Because vocabulary doesn't live in a vacuum — it lives inside ideas, and ideas connect.
+            And each term goes deeper than a one-liner. You get a plain-language definition, why it matters in context, a real scenario so you can see it in action, and related terms so the ideas start connecting instead of sitting in a list. Because that's how vocabulary actually sticks — when you can see how things link together.
           </p>
           <p>
-            The library currently covers over 400 terms across Product Design, Engineering, Business, Marketing, Finance, and Legal — and it continues to grow.
+            Right now there are over 400 terms across Product Design, Engineering, Business, Marketing, Finance, and Legal. And it keeps growing.
           </p>
         </Section>
 
         <Divider/>
 
         {/* The builder */}
-        <Section label="Built by">
+        <Section label="Who built this">
           <p>
-            Workplace Vocab was created by Michael Papanikolaou, a designer and product person based in Australia. The idea grew out of years of sitting in rooms where vocabulary was assumed, confidence gaps were quietly managed, and the people with the clearest language had a visible advantage — regardless of whether they had the best ideas.
+            Hi — I'm Michael Papanikolaou, a designer and product person based in Australia. I built this because I spent years sitting in rooms where the people with the clearest vocabulary had a real advantage. Not always the best ideas — just the best words for them. And I watched smart, capable people hold back because they weren't sure if they were using a term correctly.
           </p>
           <p>
-            The belief behind this project is simple: language is a form of access. When you have the words, you can participate. When you can participate, you can lead. This is a tool built to give more people that access, regardless of where they started or what their background is.
+            That bugged me. Language shouldn't be a gatekeeping thing. If you've got the words, you can jump into the conversation. And if you can do that, you can lead it. That's the whole idea behind this.
           </p>
           <p style={{ marginBottom: 0 }}>
-            You can find more of Michael's work at{" "}
+            You can see more of what I'm working on at{" "}
             <a href="https://www.madebymichael.com.au/uxuidesignportfolio" target="_blank" rel="noreferrer" style={{ color: "#6366F1", fontWeight: 600, textDecoration: "none" }}>
               madebymichael.com.au
             </a>
@@ -95,10 +95,10 @@ export function AboutPage({ onOpenLogin }) {
         {/* CTA */}
         <div style={{ paddingTop: 48, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
           <h2 style={{ fontSize: "clamp(24px,4vw,32px)", fontWeight: 700, letterSpacing: "-0.03em", fontFamily: "'DM Serif Display', serif", color: "#1A1A2E", margin: 0, lineHeight: 1.2 }}>
-            Ready to start?
+            Want to give it a go?
           </h2>
           <p style={{ fontSize: 16, color: "#64748B", margin: 0, lineHeight: 1.65, maxWidth: 480 }}>
-            Create a free account to save your progress, track your streaks, and work through every term at your own pace.
+            It's free. Sign up, save your progress, and work through the terms at whatever pace suits you.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 8 }}>
             <button
