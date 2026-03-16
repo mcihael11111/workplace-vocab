@@ -125,7 +125,7 @@ export default function App() {
   const handleOpenAbout = () => setActiveView("about");
 
   return (
-    <div style={{ fontFamily: "'DM Sans', -apple-system, sans-serif", background: activeView === "progress" ? "#F8FAFC" : "#fff", color: "#1A1A2E", minHeight: "100vh" }}>
+    <div style={{ fontFamily: "'DM Sans', -apple-system, sans-serif", background: (activeView === "progress" || activeView === "about") ? "#F8FAFC" : "#fff", color: "#1A1A2E", minHeight: "100vh" }}>
       <SiteNav
         user={user}
         onOpenLogin={openLogin}
