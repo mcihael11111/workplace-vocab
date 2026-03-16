@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { ALL_WORDS } from "../../data/words.js";
 
@@ -159,8 +160,8 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
             <span style={{ display: "block", width: 22, height: 2, background: "#1A1A2E", borderRadius: 99, transition: "all 0.2s", transform: menuOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" }}/>
           </button>
 
-          {/* Bottom sheet overlay */}
-          {menuOpen && (
+          {/* Bottom sheet — portalled to body to escape nav's backdrop-filter stacking context */}
+          {menuOpen && createPortal(
             <>
               <div
                 onClick={() => setMenuOpen(false)}
@@ -245,7 +246,8 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
                   )}
                 </div>
               </div>
-            </>
+            </>,
+            document.body
           )}
         </>
       ) : (
