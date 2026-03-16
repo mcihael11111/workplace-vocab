@@ -8,8 +8,7 @@ import { ALL_WORDS }    from "../../data/words.js";
 import { BookOpen }     from "lucide-react";
 
 // TermPanel — category list (screen 1) + flashcard detail (screen 2).
-// Mobile: smooth real-time drag gesture (sheet follows finger), scroll-area handoff.
-// Inspired by Google Maps / Apple Maps bottom sheet pattern.
+// Both mobile and desktop: right-side panel with rounded left corners.
 export function TermPanel({
   cat, onClose,
   isPro = false, unlockedTerms, viewedTerms = new Set(),
@@ -23,131 +22,9 @@ export function TermPanel({
   const [activeIndex,      setActiveIndex]      = useState(0);
   const [scenarioOpen,     setScenarioOpen]     = useState(false);
   const [conversationOpen, setConversationOpen] = useState(false);
-  const [isExpanded,       setIsExpanded]       = useState(false);
 
-  const panelRef        = useRef(null);
   const detailScrollRef = useRef(null);
   const listScrollRef   = useRef(null);
-
-  // ── Real-time drag state (refs only — no re-renders during drag) ───────────
-  const dragStartY   = useRef(null);
-  const dragPrevY    = useRef(null);
-  const dragVelocity = useRef(0);
-  const isDragging   = useRef(false);
-
-  // Apply transform directly to DOM — bypasses React render loop for 60fps
-  const applyTransform = (offsetY) => {
-    if (!panelRef.current) return;
-    if (offsetY > 0) {
-      panelRef.current.style.transform  = `translateY(${offsetY}px)`;
-      panelRef.current.style.transition = "border-radius 0.35s ease"; // no height/transform transition while dragging
-    } else {
-      panelRef.current.style.transform  = "";
-      panelRef.current.style.transition = ""; // restore CSS class transitions
-    }
-  };
-
-  const snapOrClose = (isExpandedCurrent) => {
-    applyTransform(0);
-    if (isExpandedCurrent) {
-      setIsExpanded(false);
-      if (listScrollRef.current)   listScrollRef.current.scrollTop   = 0;
-      if (detailScrollRef.current) detailScrollRef.current.scrollTop = 0;
-    } else {
-      onClose();
-    }
-  };
-
-  // ── Handle / header drag (drag handle + list header + detail header) ───────
-  const onHandleTouchStart = (e) => {
-    dragStartY.current   = e.touches[0].clientY;
-    dragPrevY.current    = e.touches[0].clientY;
-    dragVelocity.current = 0;
-    isDragging.current   = true;
-  };
-  const onHandleTouchMove = (e) => {
-    if (!isDragging.current) return;
-    const y  = e.touches[0].clientY;
-    dragVelocity.current = y - dragPrevY.current;
-    dragPrevY.current    = y;
-    const dy = Math.max(0, y - dragStartY.current);
-    applyTransform(dy);
-  };
-  const onHandleTouchEnd = () => {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-    const dy  = Math.max(0, dragPrevY.current - dragStartY.current);
-    const vel = dragVelocity.current;
-    if (vel > 4 || dy > window.innerHeight * 0.18) snapOrClose(isExpanded);
-    else applyTransform(0);
-    dragStartY.current = null;
-  };
-
-  // ── Scroll-area drag handoff (non-passive so we can preventDefault) ────────
-  // When content is at scroll-top and user drags down → hand off to sheet drag.
-  useEffect(() => {
-    if (!isMobile) return;
-
-    const onScrollTouchStart = (e) => {
-      dragStartY.current   = e.touches[0].clientY;
-      dragPrevY.current    = e.touches[0].clientY;
-      dragVelocity.current = 0;
-      isDragging.current   = false; // not yet — wait for downward move at top
-    };
-
-    const onScrollTouchMove = (e) => {
-      const scrollEl = e.currentTarget;
-      const y   = e.touches[0].clientY;
-      const dy  = y - (dragStartY.current ?? y);
-      dragVelocity.current = y - (dragPrevY.current ?? y);
-      dragPrevY.current    = y;
-
-      if (!isDragging.current) {
-        // Start sheet drag only when pulling down from the very top
-        if (dy > 6 && scrollEl.scrollTop <= 0) {
-          isDragging.current   = true;
-          dragStartY.current   = y; // reset origin so drag starts from here
-        }
-        return; // let scroll behave normally otherwise
-      }
-
-      // Actively dragging the sheet — prevent scroll
-      e.preventDefault();
-      applyTransform(Math.max(0, y - dragStartY.current));
-    };
-
-    const onScrollTouchEnd = () => {
-      if (!isDragging.current) { dragStartY.current = null; return; }
-      isDragging.current = false;
-      const dy  = Math.max(0, (dragPrevY.current ?? 0) - (dragStartY.current ?? 0));
-      const vel = dragVelocity.current;
-      if (vel > 4 || dy > window.innerHeight * 0.18) snapOrClose(isExpanded);
-      else applyTransform(0);
-      dragStartY.current = null;
-    };
-
-    const opts    = { passive: false };
-    const optsP   = { passive: true  };
-    const listEl  = listScrollRef.current;
-    const detailEl = detailScrollRef.current;
-
-    listEl?.addEventListener("touchstart", onScrollTouchStart, optsP);
-    listEl?.addEventListener("touchmove",  onScrollTouchMove,  opts);
-    listEl?.addEventListener("touchend",   onScrollTouchEnd,   optsP);
-
-    detailEl?.addEventListener("touchstart", onScrollTouchStart, optsP);
-    detailEl?.addEventListener("touchmove",  onScrollTouchMove,  opts);
-    detailEl?.addEventListener("touchend",   onScrollTouchEnd,   optsP);
-
-    return () => {
-      listEl?.removeEventListener("touchstart", onScrollTouchStart);
-      listEl?.removeEventListener("touchmove",  onScrollTouchMove);
-      listEl?.removeEventListener("touchend",   onScrollTouchEnd);
-      detailEl?.removeEventListener("touchstart", onScrollTouchStart);
-      detailEl?.removeEventListener("touchmove",  onScrollTouchMove);
-      detailEl?.removeEventListener("touchend",   onScrollTouchEnd);
-    };
-  }, [isMobile, isExpanded]); // re-bind when isExpanded changes so snapOrClose captures correct value
 
   // Lock body scroll
   useEffect(() => {
@@ -159,7 +36,7 @@ export function TermPanel({
   useEffect(() => {
     const h = e => {
       if (e.key !== "Escape") return;
-      if (view === "detail") { setView("list"); setIsExpanded(false); }
+      if (view === "detail") setView("list");
       else onClose();
     };
     window.addEventListener("keydown", h);
@@ -182,14 +59,9 @@ export function TermPanel({
     if (detailScrollRef.current) detailScrollRef.current.scrollTop = 0;
   }, [activeIndex]);
 
-  const handleListScroll = (e) => {
-    if (!isExpanded && e.target.scrollTop > 20) setIsExpanded(true);
-  };
-
   function openTerm(i) {
     setActiveIndex(i);
     setView("detail");
-    if (isMobile) setIsExpanded(true);
   }
 
   const isDone  = word && completedTerms.has(word.term);
@@ -197,23 +69,17 @@ export function TermPanel({
 
   // ── Panel shell ───────────────────────────────────────────────────────────
   const panelStyle = {
-    position: "fixed", background: "#fff", zIndex: 910,
-    display: "flex", flexDirection: "column",
-    // CSS transitions for snap-back and height changes
-    transition: "height 0.35s cubic-bezier(0.32,0.72,0,1), border-radius 0.35s ease",
-    ...(isMobile ? {
-      left: 0, right: 0, bottom: 0, top: "auto",
-      borderRadius: isExpanded ? "0" : "20px 20px 0 0",
-      height: isExpanded ? "100dvh" : "80vh",
-      boxShadow: "0 -8px 40px rgba(0,0,0,0.2)",
-      animation: "sheetUp 0.32s cubic-bezier(0.32,0.72,0,1)",
-    } : {
-      top: 0, right: 0, bottom: 0,
-      width: "min(560px, 92vw)",
-      borderRadius: "24px 0 0 24px",
-      boxShadow: "-24px 0 80px rgba(0,0,0,0.18)",
-      animation: "drawerIn 0.3s cubic-bezier(0.32,0.72,0,1)",
-    }),
+    position: "fixed",
+    top: 0, right: 0, bottom: 0,
+    // On mobile leave a 16px gap on the left so the rounded corners show
+    width: isMobile ? "calc(100vw - 16px)" : "min(560px, 92vw)",
+    background: "#fff",
+    zIndex: 910,
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: "20px 0 0 20px",
+    boxShadow: "-24px 0 80px rgba(0,0,0,0.18)",
+    animation: "drawerIn 0.3s cubic-bezier(0.32,0.72,0,1)",
   };
 
   const slideBase   = { position: "absolute", inset: 0, display: "flex", flexDirection: "column", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)", overflow: "hidden" };
@@ -235,20 +101,7 @@ export function TermPanel({
     <>
       <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 900, background: "rgba(10,15,30,0.55)", backdropFilter: "blur(6px)", animation: "overlayIn 0.2s ease forwards" }}/>
 
-      <div ref={panelRef} style={panelStyle}>
-
-        {/* Drag handle */}
-        {isMobile && (
-          <div
-            onTouchStart={onHandleTouchStart}
-            onTouchMove={onHandleTouchMove}
-            onTouchEnd={onHandleTouchEnd}
-            role="button" aria-label="Drag to close or collapse"
-            style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 36, cursor: "grab", flexShrink: 0, touchAction: "none" }}
-          >
-            <div style={{ width: 40, height: 4, borderRadius: 99, background: "#CBD5E1" }}/>
-          </div>
-        )}
+      <div style={panelStyle}>
 
         {/* Sliding viewport */}
         <div style={{ flex: 1, position: "relative", overflow: "hidden", minHeight: 0 }}>
@@ -256,13 +109,8 @@ export function TermPanel({
           {/* ── SCREEN 1: LIST ──────────────────────────────────────────── */}
           <div style={listSlide}>
 
-            {/* List header — also a drag target */}
-            <div
-              onTouchStart={isMobile ? onHandleTouchStart : undefined}
-              onTouchMove={isMobile ? onHandleTouchMove   : undefined}
-              onTouchEnd={isMobile  ? onHandleTouchEnd    : undefined}
-              style={{ padding: `${isMobile ? 16 : 24}px ${P}px 16px`, borderBottom: "1px solid #F1F5F9", flexShrink: 0, touchAction: "none" }}
-            >
+            {/* List header */}
+            <div style={{ padding: `${isMobile ? 16 : 24}px ${P}px 16px`, borderBottom: "1px solid #F1F5F9", flexShrink: 0 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 12, flexShrink: 0 }}>
@@ -282,10 +130,9 @@ export function TermPanel({
               <p style={{ fontSize: 13, color: "#64748B", margin: 0, lineHeight: 1.5 }}>{cat.description}</p>
             </div>
 
-            {/* List body — scroll handoff handled by useEffect */}
+            {/* List body */}
             <div
               ref={listScrollRef}
-              onScroll={isMobile ? handleListScroll : undefined}
               style={{ flex: 1, overflowY: "auto", padding: `16px ${P}px`, WebkitOverflowScrolling: "touch" }}
             >
               {words.length === 0 ? (
@@ -307,16 +154,11 @@ export function TermPanel({
           <div style={detailSlide}>
             {word && (
               <>
-                {/* Detail header — also a drag target */}
-                <div
-                  onTouchStart={isMobile ? onHandleTouchStart : undefined}
-                  onTouchMove={isMobile ? onHandleTouchMove   : undefined}
-                  onTouchEnd={isMobile  ? onHandleTouchEnd    : undefined}
-                  style={{ padding: `${isMobile ? 12 : 20}px ${P}px 14px`, borderBottom: "1px solid #F1F5F9", flexShrink: 0, touchAction: "none" }}
-                >
+                {/* Detail header */}
+                <div style={{ padding: `${isMobile ? 12 : 20}px ${P}px 14px`, borderBottom: "1px solid #F1F5F9", flexShrink: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <button
-                      onClick={() => { setView("list"); setIsExpanded(false); }}
+                      onClick={() => setView("list")}
                       aria-label="Back to list"
                       style={{ display: "flex", alignItems: "center", gap: 3, background: "none", border: "none", cursor: "pointer", color: "#64748B", padding: "4px 0", fontSize: 13, fontWeight: 600, flexShrink: 0, whiteSpace: "nowrap" }}
                     >
