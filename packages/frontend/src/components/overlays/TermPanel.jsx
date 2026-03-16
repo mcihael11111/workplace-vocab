@@ -105,7 +105,7 @@ export function TermPanel({
     display: "flex", flexDirection: "column",
     ...(isMobile ? {
       left: 0, right: 0, bottom: 0, top: "auto",
-      borderRadius: isExpanded ? "16px 16px 0 0" : "20px 20px 0 0",
+      borderRadius: isExpanded ? "0" : "20px 20px 0 0",
       height: isExpanded ? "100dvh" : "80vh",
       transition: "height 0.35s cubic-bezier(0.32,0.72,0,1), border-radius 0.35s ease",
       boxShadow: "0 -8px 40px rgba(0,0,0,0.2)",
