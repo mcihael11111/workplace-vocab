@@ -8,7 +8,7 @@ import { FeaturedSection }    from "./components/sections/FeaturedSection.jsx";
 import { CtaSection }         from "./components/sections/CtaSection.jsx";
 import { ProgressSection }    from "./components/sections/ProgressSection.jsx";
 import { Ticker }             from "./components/ui/Ticker.jsx";
-import { CategoryDrawer }     from "./components/overlays/CategoryDrawer.jsx";
+import { TermPanel }          from "./components/overlays/TermPanel.jsx";
 import { FlashcardModal }     from "./components/overlays/FlashcardModal.jsx";
 import { LoginModal }         from "./components/overlays/LoginModal.jsx";
 import { MilestoneSheet }     from "./components/overlays/MilestoneSheet.jsx";
@@ -173,15 +173,20 @@ export default function App() {
         </>
       )}
 
-      {/* Category drawer */}
+      {/* Category term panel */}
       {drawerCat && (
-        <CategoryDrawer
+        <TermPanel
           cat={drawerCat}
           onClose={closeDrawer}
-          onOpenCard={(words, i) => {
-            closeDrawer();
-            setTimeout(() => openModal(words, i), 50);
-          }}
+          isPro={isPro}
+          unlockedTerms={DAILY_UNLOCKED}
+          viewedTerms={viewedTerms}
+          isViewLimitReached={isViewLimitReached}
+          onView={trackView}
+          user={user}
+          completedTerms={completedTerms}
+          onToggleComplete={toggleComplete}
+          onUpgrade={handleUpgrade}
         />
       )}
 
