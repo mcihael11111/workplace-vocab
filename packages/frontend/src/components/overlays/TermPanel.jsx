@@ -377,7 +377,7 @@ function TermRow({ word, cat, onOpen }) {
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
         <Badge level={word.level}/>
-        <div style={{ width: 30, height: 44, borderRadius: 8, background: (hov || pressed) ? cat.accent : "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s" }}>
+        <div style={{ width: 32, height: 32, borderRadius: 8, background: (hov || pressed) ? cat.accent : "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.15s", flexShrink: 0 }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={(hov || pressed) ? "#fff" : "#94A3B8"} strokeWidth="2.5">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
