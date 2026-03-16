@@ -84,7 +84,7 @@ export function TermPanel({
     display: "flex", flexDirection: "column",
     ...(isMobile ? {
       left: 0, right: 0, bottom: 0, top: "auto",
-      borderRadius: "20px 20px 0 0", maxHeight: "92vh",
+      borderRadius: "20px 20px 0 0", height: "92vh",
       boxShadow: "0 -16px 60px rgba(0,0,0,0.18)",
       animation: "sheetUp 0.32s cubic-bezier(0.32,0.72,0,1)",
     } : {
