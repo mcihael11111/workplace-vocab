@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
+import { ALL_WORDS } from "../../data/words.js";
 
 const NAV_LINKS = [
   ["Categories", "#categories"],
@@ -7,20 +8,83 @@ const NAV_LINKS = [
   ["About",       "#about"],
 ];
 
-// Sticky top nav. Shows user avatar + progress link when logged in.
-export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingOut }) {
-  const isMobile  = useWindowSize() < 768;
-  const [menuOpen, setMenuOpen]       = useState(false);
-  const [dropOpen, setDropOpen]       = useState(false);
+export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingOut, completedTerms = new Set() }) {
+  const isMobile   = useWindowSize() < 768;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(false);
 
-  const isLoading = user === undefined;
+  const isLoading  = user === undefined;
   const isLoggedIn = !!user;
 
-  // Avatar: Google photo or initials
+  const total = ALL_WORDS.length;
+  const done  = completedTerms.size;
+  const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
+
   const initials = user?.displayName
     ? user.displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
     : "?";
 
+  // ── Bottom sheet drag-to-dismiss ──────────────────────────────────────────
+  const sheetRef     = useRef(null);
+  const dragStartY   = useRef(null);
+  const dragPrevY    = useRef(null);
+  const dragVelocity = useRef(0);
+  const isDragging   = useRef(false);
+
+  const applyTransform = (offsetY) => {
+    if (!sheetRef.current) return;
+    if (offsetY > 0) {
+      sheetRef.current.style.transform  = `translateY(${offsetY}px)`;
+      sheetRef.current.style.transition = "none";
+    } else {
+      sheetRef.current.style.transform  = "";
+      sheetRef.current.style.transition = "";
+    }
+  };
+
+  const onTouchStart = (e) => {
+    dragStartY.current   = e.touches[0].clientY;
+    dragPrevY.current    = e.touches[0].clientY;
+    dragVelocity.current = 0;
+    isDragging.current   = true;
+  };
+  const onTouchMove = (e) => {
+    if (!isDragging.current) return;
+    const y = e.touches[0].clientY;
+    dragVelocity.current = y - dragPrevY.current;
+    dragPrevY.current    = y;
+    const dy = Math.max(0, y - dragStartY.current);
+    applyTransform(dy);
+  };
+  const onTouchEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    const dy  = Math.max(0, (dragPrevY.current ?? 0) - (dragStartY.current ?? 0));
+    const vel = dragVelocity.current;
+    if (vel > 4 || dy > window.innerHeight * 0.15) {
+      setMenuOpen(false);
+    } else {
+      applyTransform(0);
+    }
+    dragStartY.current = null;
+  };
+
+  // Lock body scroll while sheet is open
+  useEffect(() => {
+    if (!menuOpen) return;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    const h = e => { if (e.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [menuOpen]);
+
+  // ── Desktop user avatar dropdown ─────────────────────────────────────────
   const UserAvatar = () => (
     <div style={{ position: "relative" }}>
       <button
@@ -84,6 +148,7 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
 
       {isMobile ? (
         <>
+          {/* Hamburger */}
           <button
             onClick={() => setMenuOpen(o => !o)}
             aria-label="Toggle menu"
@@ -93,31 +158,98 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
             <span style={{ display: "block", width: 22, height: 2, background: "#1A1A2E", borderRadius: 99, transition: "all 0.2s", opacity: menuOpen ? 0 : 1 }}/>
             <span style={{ display: "block", width: 22, height: 2, background: "#1A1A2E", borderRadius: 99, transition: "all 0.2s", transform: menuOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" }}/>
           </button>
+
+          {/* Bottom sheet overlay */}
           {menuOpen && (
-            <div style={{ position: "fixed", top: 60, left: 0, right: 0, background: "#fff", borderBottom: "1px solid #F1F5F9", padding: "12px 24px 20px", zIndex: 99, display: "flex", flexDirection: "column", gap: 4, boxShadow: "0 8px 32px rgba(0,0,0,0.08)" }}>
-              {NAV_LINKS.map(([label, href]) => (
-                <a key={label} href={href} onClick={() => setMenuOpen(false)} style={{ padding: "12px 8px", fontSize: 15, fontWeight: 600, color: "#1A1A2E", textDecoration: "none", borderBottom: "1px solid #F8FAFC", display: "block" }}>
-                  {label}
-                </a>
-              ))}
-              {isLoggedIn ? (
-                <>
-                  <button onClick={() => { setMenuOpen(false); onOpenProgress(); }} style={{ background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 8, padding: "12px 16px", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>
-                    My Progress
-                  </button>
-                  <button onClick={() => { setMenuOpen(false); onSignOut(); }} disabled={signingOut} style={{ background: "none", color: signingOut ? "#94A3B8" : "#64748B", border: "1.5px solid #E2E8F0", borderRadius: 8, padding: "11px 16px", fontSize: 14, fontWeight: 600, cursor: signingOut ? "not-allowed" : "pointer" }}>
-                    {signingOut ? "Signing out…" : "Sign out"}
-                  </button>
-                </>
-              ) : (
-                <button onClick={() => { setMenuOpen(false); onOpenLogin(); }} style={{ background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 8, padding: "12px 16px", fontSize: 14, fontWeight: 600, cursor: "pointer", marginTop: 8 }}>
-                  Start learning
-                </button>
-              )}
-            </div>
+            <>
+              <div
+                onClick={() => setMenuOpen(false)}
+                style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(10,15,30,0.55)", backdropFilter: "blur(6px)", animation: "overlayIn 0.2s ease forwards" }}
+              />
+
+              {/* Sheet */}
+              <div
+                ref={sheetRef}
+                style={{
+                  position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 201,
+                  background: "#fff",
+                  borderRadius: "20px 20px 0 0",
+                  boxShadow: "0 -8px 40px rgba(0,0,0,0.15)",
+                  animation: "sheetUp 0.32s cubic-bezier(0.32,0.72,0,1)",
+                  paddingBottom: "env(safe-area-inset-bottom, 20px)",
+                }}
+              >
+                {/* Drag handle */}
+                <div
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                  style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 36, cursor: "grab", touchAction: "none" }}
+                >
+                  <div style={{ width: 40, height: 4, borderRadius: 99, background: "#CBD5E1" }}/>
+                </div>
+
+                {/* Nav links */}
+                <div style={{ padding: "0 20px 16px" }}>
+                  {NAV_LINKS.map(([label, href]) => (
+                    <a
+                      key={label} href={href}
+                      onClick={() => setMenuOpen(false)}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 4px", fontSize: 17, fontWeight: 600, color: "#1A1A2E", textDecoration: "none", borderBottom: "1px solid #F1F5F9" }}
+                    >
+                      {label}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                  ))}
+                </div>
+
+                {/* Conversion section */}
+                <div style={{ padding: "12px 20px 4px", borderTop: "1px solid #F1F5F9" }}>
+                  {isLoggedIn ? (
+                    <>
+                      {/* Mini progress strip */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                        <div style={{ flex: 1, height: 5, background: "#F1F5F9", borderRadius: 99, overflow: "hidden" }}>
+                          <div style={{ height: "100%", borderRadius: 99, background: pct === 100 ? "#22C55E" : "#6366F1", width: `${pct}%`, transition: "width 0.5s ease" }}/>
+                        </div>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "#6366F1", whiteSpace: "nowrap" }}>
+                          {done}/{total} · {pct}%
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => { setMenuOpen(false); onOpenProgress(); }}
+                        style={{ width: "100%", background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 12, padding: "14px 16px", fontSize: 15, fontWeight: 700, cursor: "pointer", marginBottom: 10 }}
+                      >
+                        My Progress
+                      </button>
+                      <button
+                        onClick={() => { setMenuOpen(false); onSignOut(); }}
+                        disabled={signingOut}
+                        style={{ width: "100%", background: "none", color: signingOut ? "#94A3B8" : "#94A3B8", border: "none", padding: "10px 16px", fontSize: 14, fontWeight: 500, cursor: signingOut ? "not-allowed" : "pointer" }}
+                      >
+                        {signingOut ? "Signing out…" : "Sign out"}
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p style={{ fontSize: 13, color: "#94A3B8", margin: "0 0 12px", textAlign: "center", fontWeight: 500 }}>
+                        Save progress &amp; track your streaks
+                      </p>
+                      <button
+                        onClick={() => { setMenuOpen(false); onOpenLogin(); }}
+                        style={{ width: "100%", background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 12, padding: "14px 16px", fontSize: 15, fontWeight: 700, cursor: "pointer" }}
+                      >
+                        Sign in — it's free
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>
           )}
         </>
       ) : (
+        /* Desktop nav */
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           {NAV_LINKS.map(([item, href]) => (
             <a

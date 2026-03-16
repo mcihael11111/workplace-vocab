@@ -129,6 +129,7 @@ export default function App() {
         onOpenProgress={handleOpenProgress}
         onSignOut={handleSignOut}
         signingOut={signingOut}
+        completedTerms={completedTerms}
       />
 
       {activeView === "progress" && user ? (
