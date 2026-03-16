@@ -3,6 +3,7 @@
 // Category accent, icon, and name update daily with the term.
 import { ALL_WORDS } from "../../data/words.js";
 import { CAT_MAP } from "../../utils/termLookup.js";
+import { BookOpen } from "lucide-react";
 
 function getDailyTerm() {
   const dayIndex = Math.floor(Date.now() / 86400000);
@@ -11,7 +12,7 @@ function getDailyTerm() {
 
 export function TermOfTheDay({ completedTerms, onOpen }) {
   const term   = getDailyTerm();
-  const cat    = CAT_MAP[term.category] || { accent: "#6366F1", color: "#EEF2FF", icon: "📖", name: term.category };
+  const cat    = CAT_MAP[term.category] || { accent: "#6366F1", color: "#EEF2FF", icon: BookOpen, name: term.category };
   const isDone = completedTerms.has(term.term);
 
   const handleOpen = () => {
@@ -41,8 +42,8 @@ export function TermOfTheDay({ completedTerms, onOpen }) {
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#94A3B8", margin: 0 }}>
               Word of the day
             </p>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: cat.color, borderRadius: 99, padding: "2px 8px 2px 5px" }}>
-              <span style={{ fontSize: 11 }}>{cat.icon}</span>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: cat.color, borderRadius: 99, padding: "3px 8px 3px 6px" }}>
+              <cat.icon size={11} color={cat.accent} strokeWidth={2} />
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: cat.accent }}>{cat.name}</span>
             </div>
           </div>

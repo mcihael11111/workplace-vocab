@@ -33,9 +33,9 @@ export default function App() {
     if (type === "confetti") {
       setMilestone(3);
     } else if (type === "dailyGoal") {
-      showToast({ message: `Daily goal hit! 🔥 ${streakDays > 1 ? `${streakDays}-day streak` : "Keep it up"}` });
+      showToast({ message: `Daily goal hit! ${streakDays > 1 ? `${streakDays}-day streak` : "Keep it up"}` });
     } else if (type === "streak") {
-      showToast({ message: `${days}-day streak! 🔥 You're on a roll` });
+      showToast({ message: `${days}-day streak! You're on a roll` });
     }
   };
 
@@ -74,7 +74,7 @@ export default function App() {
       const words = ALL_WORDS.filter(w => w.category === cat.name);
       if (words.length === 0) continue;
       if (words.every(w => completedTerms.has(w.term)) && !words.every(w => prev.has(w.term))) {
-        showToast({ message: `${cat.icon} ${cat.name} mastered! 🏆` });
+        showToast({ message: `${cat.name} mastered! All terms complete.` });
       }
     }
     prevCompletedRef.current = completedTerms;
@@ -98,7 +98,7 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("session_id")) {
-      showToast({ message: "🎉 You're now Pro! All cards are unlocked." });
+      showToast({ message: "You're now Pro! All cards are unlocked." });
       window.history.replaceState({}, "", "/");
     }
   }, []);

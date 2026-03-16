@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ALL_WORDS } from "../../data/words.js";
 import { CATEGORIES } from "../../data/categories.js";
 import { Badge } from "../ui/Badge.jsx";
+import { Trophy } from "lucide-react";
 
 export function ProgressSection({ completedTerms, toggleComplete, onGoHome, onOpenModal }) {
   const [expandedCat, setExpandedCat] = useState(null);
@@ -70,14 +71,14 @@ export function ProgressSection({ completedTerms, toggleComplete, onGoHome, onOp
 
                 {/* Category header row */}
                 <div style={{ padding: "18px 20px", display: "flex", alignItems: "center", gap: 14 }}>
-                  <span style={{ fontSize: 20, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 10, flexShrink: 0 }}>
-                    {cat.icon}
+                  <span style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 10, flexShrink: 0 }}>
+                    <cat.icon size={18} color={cat.accent} strokeWidth={1.75} />
                   </span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                       <span style={{ fontWeight: 700, fontSize: 15, color: "#1A1A2E", letterSpacing: "-0.01em" }}>{cat.name}</span>
                       {allDone && (
-                        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 99, padding: "2px 8px", display: "inline-flex", alignItems: "center", gap: 4 }}>🏆 Complete</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#16A34A", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 99, padding: "2px 8px", display: "inline-flex", alignItems: "center", gap: 4 }}><Trophy size={10} color="#16A34A" strokeWidth={2.5} /> Complete</span>
                       )}
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

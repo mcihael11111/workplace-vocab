@@ -1,4 +1,5 @@
 import { CategoryCard } from "../cards/CategoryCard.jsx";
+import { Search } from "lucide-react";
 import { FilterPills } from "../ui/FilterPills.jsx";
 import { DOMAINS } from "../../data/domains.js";
 import { filterCategories } from "../../utils/filterUtils.js";
@@ -38,9 +39,9 @@ export function CategoriesSection({ search, activeDomain, onDomainChange, onOpen
         })}
       </div>
       {search && filteredCats.length === 0 && (
-        <div style={{ textAlign: "center", padding: "60px 24px", color: "#94A3B8" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>🔍</div>
-          <p style={{ fontSize: 16, fontWeight: 500 }}>No categories match "{search}"</p>
+        <div style={{ textAlign: "center", padding: "60px 24px", color: "#94A3B8", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <Search size={32} color="#CBD5E1" strokeWidth={1.5} />
+          <p style={{ fontSize: 16, fontWeight: 500, margin: 0 }}>No categories match "{search}"</p>
         </div>
       )}
     </section>

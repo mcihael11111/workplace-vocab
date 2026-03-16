@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Inbox } from "lucide-react";
 import { ALL_WORDS } from "../../data/words.js";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { DrawerWordRow } from "./DrawerWordRow.jsx";
@@ -47,8 +48,8 @@ export function CategoryDrawer({ cat, onClose, onOpenCard }) {
         <div style={{ padding: "28px 28px 24px", borderBottom: "1px solid #F1F5F9", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 24, width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 12 }}>
-                {cat.icon}
+              <span style={{ width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 12 }}>
+                <cat.icon size={22} color={cat.accent} strokeWidth={1.75} />
               </span>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: cat.accent, margin: 0, marginBottom: 2 }}>
@@ -72,9 +73,9 @@ export function CategoryDrawer({ cat, onClose, onOpenCard }) {
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px 32px" }}>
           {words.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "60px 0", color: "#94A3B8" }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>📭</div>
-              <p style={{ fontSize: 15, fontWeight: 500 }}>More terms coming soon</p>
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#94A3B8", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+              <Inbox size={32} color="#CBD5E1" strokeWidth={1.5} />
+              <p style={{ fontSize: 15, fontWeight: 500, margin: 0 }}>More terms coming soon</p>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

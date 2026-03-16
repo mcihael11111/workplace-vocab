@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Trophy } from "lucide-react";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 
 const MILESTONES = [
@@ -66,11 +67,11 @@ export function MilestoneSheet({ currentCount, onClose }) {
           width: 96, height: 96, borderRadius: 28,
           background: "linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 52, marginBottom: 24,
+          marginBottom: 24,
           boxShadow: "0 0 0 8px #FEF9EC, 0 0 0 16px #FEF3C7",
           animation: "trophyPop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both",
         }}>
-          🏆
+          <Trophy size={48} color="#D97706" strokeWidth={1.5} />
         </div>
 
         {/* Heading */}
@@ -102,13 +103,11 @@ export function MilestoneSheet({ currentCount, onClose }) {
                 background: isUnlocked ? "#FFFBEB" : "#F8FAFC",
                 border: `1.5px solid ${isUnlocked ? "#FDE68A" : "#E2E8F0"}`,
               }}>
-                <span style={{
-                  fontSize: 22,
-                  filter: isUnlocked ? "none" : "grayscale(1)",
-                  opacity: isUnlocked ? 1 : 0.35,
-                }}>
-                  🏆
-                </span>
+                <Trophy
+                  size={22}
+                  color={isUnlocked ? "#D97706" : "#CBD5E1"}
+                  strokeWidth={1.5}
+                />
                 <span style={{
                   fontSize: 11, fontWeight: 700, color: isUnlocked ? "#D97706" : "#CBD5E1",
                   letterSpacing: "0.02em",

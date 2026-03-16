@@ -3,6 +3,7 @@ import { Badge } from "../ui/Badge.jsx";
 import { RelatedChip } from "../ui/RelatedChip.jsx";
 import { ChevronBtn } from "../ui/ChevronBtn.jsx";
 import { CAT_MAP, findTermByName, isTermLocked } from "../../utils/termLookup.js";
+import { BookOpen } from "lucide-react";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 
 // Full flashcard overlay.
@@ -15,7 +16,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
   const word   = words[activeIndex];
   // Locked if: not Pro, limit reached, term never viewed before, and not the daily term override
   const locked = !isPro && isViewLimitReached && !viewedTerms.has(word.term) && !unlockedTerms?.has(word.term);
-  const cat    = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: "📖" };
+  const cat    = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: BookOpen };
   const isDone = completedTerms.has(word.term);
   const total  = words.length;
   const isMobile = useWindowSize() < 768;
@@ -149,7 +150,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px", height: 52 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 14 }}>{cat.icon}</span>
+                <cat.icon size={14} color={cat.accent} strokeWidth={1.75} />
                 <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.02em", fontFamily: "'DM Serif Display', serif", color: "#1A1A2E" }}>
                   {word.term}
                 </span>
@@ -183,7 +184,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 18, width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 8 }}>{cat.icon}</span>
+              <span style={{ width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 8 }}><cat.icon size={16} color={cat.accent} strokeWidth={1.75} /></span>
               <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: cat.accent }}>{word.category}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

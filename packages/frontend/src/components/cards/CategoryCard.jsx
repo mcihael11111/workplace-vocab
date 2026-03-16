@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trophy } from "lucide-react";
 
 export function CategoryCard({ cat, onClick, completedCount, totalCount }) {
   const [hov,     setHov]     = useState(false);
@@ -45,12 +46,12 @@ export function CategoryCard({ cat, onClick, completedCount, totalCount }) {
     >
       {/* Top row: icon + complete badge */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <span style={{ fontSize: 22, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 10, flexShrink: 0 }}>
-          {cat.icon}
+        <span style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 10, flexShrink: 0 }}>
+          <cat.icon size={20} color={cat.accent} strokeWidth={1.75} />
         </span>
         {allDone && (
           <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.04em", textTransform: "uppercase", color: "#16A34A", background: "#DCFCE7", border: "1px solid #86EFAC", padding: "3px 9px", borderRadius: 99, display: "flex", alignItems: "center", gap: 4 }}>
-            🏆 Complete
+            <Trophy size={11} color="#16A34A" strokeWidth={2.5} /> Complete
           </span>
         )}
       </div>
