@@ -8,7 +8,7 @@ import { Breadcrumbs } from "../components/ui/Breadcrumbs.jsx";
 import { SEOHead } from "../components/ui/SEOHead.jsx";
 import { ArrowRight } from "lucide-react";
 
-export function CategoryPage({ completedTerms = new Set(), user, onOpenDrawer }) {
+export function CategoryPage({ completedTerms = new Set(), user, onOpenModal }) {
   const { categorySlug } = useParams();
   const cat = findCategoryById(CATEGORIES, categorySlug);
 
@@ -56,8 +56,8 @@ export function CategoryPage({ completedTerms = new Set(), user, onOpenDrawer })
 
       {/* Term list */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {words.map((w) => (
-          <TermListItem key={w.term} word={w} cat={cat} onOpen={() => onOpenDrawer(cat)} />
+        {words.map((w, i) => (
+          <TermListItem key={w.term} word={w} cat={cat} onOpen={() => onOpenModal(words, i)} />
         ))}
       </div>
 

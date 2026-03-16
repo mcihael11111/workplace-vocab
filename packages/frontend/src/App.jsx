@@ -220,7 +220,7 @@ export default function App() {
 
         {/* Single category */}
         <Route path="/categories/:categorySlug" element={
-          <CategoryPage completedTerms={completedTerms} user={user} onOpenDrawer={openDrawer}/>
+          <CategoryPage completedTerms={completedTerms} user={user} onOpenModal={openModal}/>
         }/>
 
         {/* 404 */}
