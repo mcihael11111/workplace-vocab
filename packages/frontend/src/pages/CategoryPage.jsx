@@ -57,7 +57,7 @@ export function CategoryPage({ completedTerms = new Set(), user, onOpenDrawer })
       {/* Term list */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {words.map((w, i) => (
-          <TermListItem key={w.term} word={w} cat={cat} onOpen={() => onOpenDrawer(cat)} />
+          <TermListItem key={w.term} word={w} cat={cat} onOpen={() => onOpenDrawer(cat, i)} />
         ))}
       </div>
 

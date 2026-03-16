@@ -11,7 +11,7 @@ import { BookOpen }     from "lucide-react";
 // Mobile: smooth real-time drag gesture (sheet follows finger), scroll-area handoff.
 // Inspired by Google Maps / Apple Maps bottom sheet pattern.
 export function TermPanel({
-  cat, onClose,
+  cat, onClose, startIndex = null,
   isPro = false, unlockedTerms, viewedTerms = new Set(),
   isViewLimitReached = false, onView,
   user, completedTerms = new Set(), onToggleComplete, onUpgrade,
@@ -19,11 +19,11 @@ export function TermPanel({
   const words    = ALL_WORDS.filter(w => w.category === cat.name);
   const isMobile = useWindowSize() < 768;
 
-  const [view,             setView]             = useState("list");
-  const [activeIndex,      setActiveIndex]      = useState(0);
+  const [view,             setView]             = useState(startIndex !== null ? "detail" : "list");
+  const [activeIndex,      setActiveIndex]      = useState(startIndex !== null ? startIndex : 0);
   const [scenarioOpen,     setScenarioOpen]     = useState(false);
   const [conversationOpen, setConversationOpen] = useState(false);
-  const [isExpanded,       setIsExpanded]       = useState(false);
+  const [isExpanded,       setIsExpanded]       = useState(startIndex !== null && isMobile);
 
   const panelRef        = useRef(null);
   const detailScrollRef = useRef(null);

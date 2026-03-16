@@ -72,7 +72,7 @@ export default function App() {
   const [toast,        setToast]        = useState(null);
 
   const { modalWords, modalIndex, openModal, closeModal, prevCard, nextCard, openRelated } = useModalState();
-  const { drawerCat,  openDrawer, closeDrawer } = useDrawerState();
+  const { drawerCat, drawerStartIndex, openDrawer, closeDrawer } = useDrawerState();
 
   const showToast = (msg) => {
     setToast(typeof msg === "string" ? { message: msg } : msg);
@@ -235,6 +235,7 @@ export default function App() {
         <TermPanel
           cat={drawerCat}
           onClose={closeDrawer}
+          startIndex={drawerStartIndex}
           isPro={isPro}
           unlockedTerms={DAILY_UNLOCKED}
           viewedTerms={viewedTerms}
