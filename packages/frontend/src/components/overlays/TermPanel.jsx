@@ -7,9 +7,9 @@ import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { ALL_WORDS }    from "../../data/words.js";
 import { BookOpen }     from "lucide-react";
 
-// TermPanel — single overlay that handles both the category term list (screen 1)
-// and the flashcard detail (screen 2) with an iOS-style horizontal push transition.
-// Replaces CategoryDrawer + FlashcardModal for the category browse flow.
+// TermPanel — single overlay: category list (screen 1) + flashcard detail (screen 2).
+// Mobile: bottom sheet starting at 80vh, expands to 100dvh on scroll.
+// Desktop: right-side drawer with rounded left corners.
 export function TermPanel({
   cat, onClose,
   isPro = false, unlockedTerms, viewedTerms = new Set(),
@@ -19,13 +19,15 @@ export function TermPanel({
   const words    = ALL_WORDS.filter(w => w.category === cat.name);
   const isMobile = useWindowSize() < 768;
 
-  const [view,             setView]             = useState("list");    // "list" | "detail"
+  const [view,             setView]             = useState("list");
   const [activeIndex,      setActiveIndex]      = useState(0);
   const [scenarioOpen,     setScenarioOpen]     = useState(false);
   const [conversationOpen, setConversationOpen] = useState(false);
+  const [isExpanded,       setIsExpanded]       = useState(false); // mobile 80→100
 
-  const scrollRef    = useRef(null);
-  const dismissY     = useRef(null);
+  const detailScrollRef = useRef(null);
+  const listScrollRef   = useRef(null);
+  const dismissY        = useRef(null);
 
   // Lock body scroll
   useEffect(() => {
@@ -44,12 +46,12 @@ export function TermPanel({
     return () => window.removeEventListener("keydown", h);
   }, [view, onClose]);
 
-  // Track view + reset accordions on term change
   const word   = words[activeIndex];
   const locked = word && !isPro && isViewLimitReached
     && !viewedTerms.has(word.term)
     && !unlockedTerms?.has(word.term);
 
+  // Track view + reset accordions
   useEffect(() => {
     if (view !== "detail" || !word) return;
     setScenarioOpen(false);
@@ -59,33 +61,54 @@ export function TermPanel({
 
   // Reset detail scroll on term change
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    if (detailScrollRef.current) detailScrollRef.current.scrollTop = 0;
   }, [activeIndex]);
 
-  // Swipe-down dismiss (drag handle)
+  // ── Swipe-down dismiss / collapse ────────────────────────────────────────
+  // Applied to drag handle AND category/detail header for wider gesture area.
+  // Expanded (100%) → collapse to 80% first; collapsed → close.
   const handleDismissStart = e => { dismissY.current = e.touches[0].clientY; };
   const handleDismissEnd   = e => {
     if (dismissY.current === null) return;
-    if (e.changedTouches[0].clientY - dismissY.current > 60) onClose();
+    const dy = e.changedTouches[0].clientY - dismissY.current;
+    if (dy > 50) {
+      if (isExpanded) {
+        setIsExpanded(false);
+        if (listScrollRef.current)   listScrollRef.current.scrollTop = 0;
+        if (detailScrollRef.current) detailScrollRef.current.scrollTop = 0;
+      } else {
+        onClose();
+      }
+    }
     dismissY.current = null;
+  };
+
+  // Expand sheet when list content is scrolled
+  const handleListScroll = e => {
+    if (!isExpanded && e.target.scrollTop > 20) setIsExpanded(true);
   };
 
   function openTerm(i) {
     setActiveIndex(i);
     setView("detail");
+    // Expand sheet when entering detail on mobile
+    if (isMobile) setIsExpanded(true);
   }
 
-  const isDone   = word && completedTerms.has(word.term);
-  const wordCat  = (word && CAT_MAP[word.category]) || { accent: cat.accent, color: cat.color, icon: BookOpen };
+  const isDone  = word && completedTerms.has(word.term);
+  const wordCat = (word && CAT_MAP[word.category]) || { accent: cat.accent, color: cat.color, icon: BookOpen };
 
-  // ─── Shared panel shell ────────────────────────────────────────────────────
+  // ── Panel shell ────────────────────────────────────────────────────────────
+  const MARGIN = 16;
   const panelStyle = {
     position: "fixed", background: "#fff", zIndex: 910,
     display: "flex", flexDirection: "column",
     ...(isMobile ? {
-      left: 0, right: 0, bottom: 0, top: "auto",
-      borderRadius: "20px 20px 0 0", height: "92vh",
-      boxShadow: "0 -16px 60px rgba(0,0,0,0.18)",
+      left: MARGIN, right: MARGIN, bottom: 0, top: "auto",
+      borderRadius: isExpanded ? "16px 16px 0 0" : "20px 20px 0 0",
+      height: isExpanded ? "100dvh" : "80vh",
+      transition: "height 0.35s cubic-bezier(0.32,0.72,0,1), border-radius 0.35s ease",
+      boxShadow: "0 -8px 40px rgba(0,0,0,0.2)",
       animation: "sheetUp 0.32s cubic-bezier(0.32,0.72,0,1)",
     } : {
       top: 0, right: 0, bottom: 0,
@@ -96,25 +119,19 @@ export function TermPanel({
     }),
   };
 
-  // ─── Slide transforms ──────────────────────────────────────────────────────
-  const slideBase = {
-    position: "absolute", inset: 0,
-    display: "flex", flexDirection: "column",
-    transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)",
-    overflow: "hidden",
-  };
-  const listSlide   = { ...slideBase, transform: view === "list"   ? "translateX(0)"    : "translateX(-100%)" };
-  const detailSlide = { ...slideBase, transform: view === "detail" ? "translateX(0)"    : "translateX(100%)"  };
+  // ── Slide transforms ───────────────────────────────────────────────────────
+  const slideBase   = { position: "absolute", inset: 0, display: "flex", flexDirection: "column", transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1)", overflow: "hidden" };
+  const listSlide   = { ...slideBase, transform: view === "list"   ? "translateX(0)" : "translateX(-100%)" };
+  const detailSlide = { ...slideBase, transform: view === "detail" ? "translateX(0)" : "translateX(100%)"  };
 
-  const CloseBtn = ({ style = {} }) => (
+  const P = isMobile ? "0 16px" : "0 28px"; // horizontal content padding
+
+  const CloseBtn = () => (
     <button
-      onClick={onClose}
-      aria-label="Close"
-      style={{ width: 36, height: 36, borderRadius: 10, background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, ...style }}
+      onClick={onClose} aria-label="Close"
+      style={{ width: 36, height: 36, borderRadius: 10, background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}
     >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5">
-        <path d="M18 6L6 18M6 6l12 12"/>
-      </svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
   );
 
@@ -128,27 +145,31 @@ export function TermPanel({
 
       <div style={panelStyle}>
 
-        {/* Drag handle — mobile only */}
+        {/* ── Drag handle (mobile) — also a swipe-down dismiss target ──────── */}
         {isMobile && (
           <div
             onTouchStart={handleDismissStart}
             onTouchEnd={handleDismissEnd}
-            role="button" aria-label="Drag down to close"
-            style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 44, cursor: "grab", flexShrink: 0 }}
+            role="button" aria-label="Drag down to close or collapse"
+            style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 36, cursor: "grab", flexShrink: 0, touchAction: "none" }}
           >
-            <div style={{ width: 36, height: 4, borderRadius: 99, background: "#E2E8F0" }}/>
+            <div style={{ width: 36, height: 4, borderRadius: 99, background: "#CBD5E1" }}/>
           </div>
         )}
 
-        {/* Sliding viewport */}
+        {/* ── Sliding viewport ─────────────────────────────────────────────── */}
         <div style={{ flex: 1, position: "relative", overflow: "hidden", minHeight: 0 }}>
 
-          {/* ── SCREEN 1: LIST ──────────────────────────────────────────────── */}
+          {/* SCREEN 1 — LIST ──────────────────────────────────────────────── */}
           <div style={listSlide}>
 
-            {/* List header */}
-            <div style={{ padding: "28px 28px 20px", borderBottom: "1px solid #F1F5F9", flexShrink: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+            {/* List header — also a swipe-down dismiss target on mobile */}
+            <div
+              onTouchStart={isMobile ? handleDismissStart : undefined}
+              onTouchEnd={isMobile ? handleDismissEnd : undefined}
+              style={{ padding: isMobile ? `16px ${MARGIN}px 16px` : "24px 28px 20px", borderBottom: "1px solid #F1F5F9", flexShrink: 0, touchAction: "none" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center", background: cat.color, borderRadius: 12, flexShrink: 0 }}>
                     <cat.icon size={22} color={cat.accent} strokeWidth={1.75}/>
@@ -157,25 +178,29 @@ export function TermPanel({
                     <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: cat.accent, margin: "0 0 2px" }}>
                       {words.length} terms
                     </p>
-                    <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em", fontFamily: "'DM Serif Display', serif", color: "#1A1A2E", margin: 0 }}>
+                    <h3 style={{ fontSize: isMobile ? 20 : 22, fontWeight: 700, letterSpacing: "-0.03em", fontFamily: "'DM Serif Display', serif", color: "#1A1A2E", margin: 0 }}>
                       {cat.name}
                     </h3>
                   </div>
                 </div>
                 <CloseBtn/>
               </div>
-              <p style={{ fontSize: 14, color: "#64748B", margin: 0, lineHeight: 1.55 }}>{cat.description}</p>
+              <p style={{ fontSize: 13, color: "#64748B", margin: 0, lineHeight: 1.5 }}>{cat.description}</p>
             </div>
 
             {/* List body */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px 32px" }}>
+            <div
+              ref={listScrollRef}
+              onScroll={isMobile ? handleListScroll : undefined}
+              style={{ flex: 1, overflowY: "auto", padding: isMobile ? `16px ${MARGIN}px` : "20px 28px 32px", WebkitOverflowScrolling: "touch" }}
+            >
               {words.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "60px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
                   <Inbox size={32} color="#CBD5E1" strokeWidth={1.5}/>
                   <p style={{ fontSize: 15, fontWeight: 500, color: "#94A3B8", margin: 0 }}>More terms coming soon</p>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: "env(safe-area-inset-bottom, 16px)" }}>
                   {words.map((w, i) => (
                     <TermRow key={w.term} word={w} cat={cat} onOpen={() => openTerm(i)}/>
                   ))}
@@ -184,17 +209,20 @@ export function TermPanel({
             </div>
           </div>
 
-          {/* ── SCREEN 2: DETAIL ────────────────────────────────────────────── */}
+          {/* SCREEN 2 — DETAIL ────────────────────────────────────────────── */}
           <div style={detailSlide}>
             {word && (
               <>
-                {/* Detail header */}
-                <div style={{ padding: isMobile ? "0 20px 16px" : "20px 28px 16px", borderBottom: "1px solid #F1F5F9", flexShrink: 0 }}>
-
+                {/* Detail header — swipe-down dismiss target on mobile */}
+                <div
+                  onTouchStart={isMobile ? handleDismissStart : undefined}
+                  onTouchEnd={isMobile ? handleDismissEnd : undefined}
+                  style={{ padding: isMobile ? `12px ${MARGIN}px 14px` : "20px 28px 16px", borderBottom: "1px solid #F1F5F9", flexShrink: 0, touchAction: "none" }}
+                >
                   {/* Back + progress + close */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <button
-                      onClick={() => setView("list")}
+                      onClick={() => { setView("list"); setIsExpanded(false); }}
                       aria-label="Back to list"
                       style={{ display: "flex", alignItems: "center", gap: 3, background: "none", border: "none", cursor: "pointer", color: "#64748B", padding: "4px 0", fontSize: 13, fontWeight: 600, flexShrink: 0, whiteSpace: "nowrap" }}
                     >
@@ -208,27 +236,25 @@ export function TermPanel({
                   </div>
 
                   {/* Category chip + badge */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: wordCat.color, borderRadius: 6 }}>
-                        <wordCat.icon size={13} color={wordCat.accent} strokeWidth={1.75}/>
+                      <span style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: wordCat.color, borderRadius: 6 }}>
+                        <wordCat.icon size={12} color={wordCat.accent} strokeWidth={1.75}/>
                       </span>
-                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: wordCat.accent }}>
-                        {word.category}
-                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: wordCat.accent }}>{word.category}</span>
                     </div>
                     <Badge level={word.level}/>
                   </div>
 
                   {/* Term heading */}
-                  <h2 style={{ fontSize: "clamp(24px,4vw,32px)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1.1, color: "#1A1A2E", fontFamily: "'DM Serif Display', Georgia, serif", margin: 0 }}>
+                  <h2 style={{ fontSize: isMobile ? "clamp(22px,5vw,28px)" : "clamp(24px,4vw,32px)", fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1.1, color: "#1A1A2E", fontFamily: "'DM Serif Display', Georgia, serif", margin: 0 }}>
                     {word.term}
                   </h2>
                 </div>
 
                 {/* Detail body */}
                 {locked ? (
-                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 20px", textAlign: "center", position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", inset: 0, padding: 20, filter: "blur(8px)", opacity: 0.35, userSelect: "none", pointerEvents: "none" }}>
                       <p style={{ fontSize: 15, color: "#1A1A2E", lineHeight: 1.72 }}>{word.definition}</p>
                     </div>
@@ -247,8 +273,8 @@ export function TermPanel({
                   </div>
                 ) : (
                   <div
-                    ref={scrollRef}
-                    style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "20px 28px 28px" }}
+                    ref={detailScrollRef}
+                    style={{ flex: 1, overflowY: "auto", padding: isMobile ? `16px ${MARGIN}px 20px` : "20px 28px 28px", WebkitOverflowScrolling: "touch" }}
                   >
                     <section style={{ marginBottom: 16 }}>
                       <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>What it means</p>
@@ -265,9 +291,7 @@ export function TermPanel({
                     <section style={{ marginBottom: 12, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
                       <button onClick={() => setScenarioOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: scenarioOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>Example</span>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: scenarioOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>
-                          <path d="M6 9l6 6 6-6"/>
-                        </svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: scenarioOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}><path d="M6 9l6 6 6-6"/></svg>
                       </button>
                       <div style={{ overflow: "hidden", maxHeight: scenarioOpen ? "600px" : 0, transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: scenarioOpen ? 1 : 0 }}>
                         <div style={{ borderTop: "1.5px solid #E2E8F0", padding: "14px 16px", background: "#F8FAFC" }}>
@@ -282,9 +306,7 @@ export function TermPanel({
                     <section style={{ marginBottom: 16, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
                       <button onClick={() => setConversationOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: conversationOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>In a real conversation</span>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}>
-                          <path d="M6 9l6 6 6-6"/>
-                        </svg>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}><path d="M6 9l6 6 6-6"/></svg>
                       </button>
                       <div style={{ overflow: "hidden", maxHeight: conversationOpen ? "600px" : 0, transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: conversationOpen ? 1 : 0 }}>
                         <div style={{ borderTop: "1.5px solid #E2E8F0", padding: "14px 16px", background: "#F8FAFC", borderLeft: `4px solid ${cat.accent}` }}>
@@ -295,7 +317,7 @@ export function TermPanel({
 
                     {/* Related terms */}
                     {word.related?.length > 0 && (
-                      <section>
+                      <section style={{ paddingBottom: "env(safe-area-inset-bottom, 8px)" }}>
                         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 12 }}>Related terms</p>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                           {word.related.map(r => {
@@ -303,11 +325,8 @@ export function TermPanel({
                             const inCat  = linked && words.some(w => w.term === linked.term);
                             return (
                               <RelatedChip
-                                key={r}
-                                label={r}
-                                linked={!!linked}
-                                color={cat.color}
-                                accent={cat.accent}
+                                key={r} label={r} linked={!!linked}
+                                color={cat.color} accent={cat.accent}
                                 onClick={inCat ? () => setActiveIndex(words.findIndex(w => w.term === linked.term)) : undefined}
                               />
                             );
@@ -320,7 +339,7 @@ export function TermPanel({
 
                 {/* Mark done footer */}
                 {user && !locked && (
-                  <div style={{ padding: isMobile ? "10px 16px" : "12px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "center", flexShrink: 0, background: "#FAFAFA" }}>
+                  <div style={{ padding: isMobile ? "10px 16px" : "12px 28px", paddingBottom: isMobile ? "calc(10px + env(safe-area-inset-bottom, 0px))" : "12px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "center", flexShrink: 0, background: "#FAFAFA" }}>
                     <button
                       onClick={() => onToggleComplete(word.term)}
                       aria-label={isDone ? "Mark as not done" : "Mark as done"}
@@ -341,7 +360,7 @@ export function TermPanel({
   );
 }
 
-// ─── Term row (internal, replaces DrawerWordRow inside the panel) ─────────────
+// ─── Term row ─────────────────────────────────────────────────────────────────
 function TermRow({ word, cat, onOpen }) {
   const [hov,     setHov]     = useState(false);
   const [pressed, setPressed] = useState(false);
