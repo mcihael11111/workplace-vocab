@@ -104,7 +104,7 @@ export function TermPanel({
     position: "fixed", background: "#fff", zIndex: 910,
     display: "flex", flexDirection: "column",
     ...(isMobile ? {
-      left: MARGIN, right: MARGIN, bottom: 0, top: "auto",
+      left: 0, right: 0, bottom: 0, top: "auto",
       borderRadius: isExpanded ? "16px 16px 0 0" : "20px 20px 0 0",
       height: isExpanded ? "100dvh" : "80vh",
       transition: "height 0.35s cubic-bezier(0.32,0.72,0,1), border-radius 0.35s ease",
