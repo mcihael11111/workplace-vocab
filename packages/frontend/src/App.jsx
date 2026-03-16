@@ -6,6 +6,7 @@ import { WelcomeStrip }       from "./components/sections/WelcomeStrip.jsx";
 import { CategoriesSection }  from "./components/sections/CategoriesSection.jsx";
 import { FeaturedSection }    from "./components/sections/FeaturedSection.jsx";
 import { CtaSection }         from "./components/sections/CtaSection.jsx";
+import { AboutPage }          from "./components/sections/AboutPage.jsx";
 import { ProgressSection }    from "./components/sections/ProgressSection.jsx";
 import { Ticker }             from "./components/ui/Ticker.jsx";
 import { TermPanel }          from "./components/overlays/TermPanel.jsx";
@@ -121,18 +122,26 @@ export default function App() {
     setActiveView("progress");
   };
 
+  const handleOpenAbout = () => setActiveView("about");
+
   return (
     <div style={{ fontFamily: "'DM Sans', -apple-system, sans-serif", background: activeView === "progress" ? "#F8FAFC" : "#fff", color: "#1A1A2E", minHeight: "100vh" }}>
       <SiteNav
         user={user}
         onOpenLogin={openLogin}
         onOpenProgress={handleOpenProgress}
+        onOpenAbout={handleOpenAbout}
         onSignOut={handleSignOut}
         signingOut={signingOut}
         completedTerms={completedTerms}
       />
 
-      {activeView === "progress" && user ? (
+      {activeView === "about" ? (
+        <AboutPage
+          onGoHome={() => setActiveView("home")}
+          onOpenLogin={openLogin}
+        />
+      ) : activeView === "progress" && user ? (
         <ProgressSection
           completedTerms={completedTerms}
           toggleComplete={toggleComplete}
@@ -169,8 +178,8 @@ export default function App() {
             onOpenModal={openModal}
             completedTerms={completedTerms}
           />
-          <CtaSection onOpenLogin={openLogin}/>
-          <Footer/>
+          <CtaSection onOpenLogin={openLogin} onOpenAbout={handleOpenAbout}/>
+          <Footer onOpenAbout={handleOpenAbout}/>
         </>
       )}
 

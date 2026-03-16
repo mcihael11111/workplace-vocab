@@ -3,13 +3,12 @@ import { createPortal } from "react-dom";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { ALL_WORDS } from "../../data/words.js";
 
-const NAV_LINKS = [
+const ANCHOR_LINKS = [
   ["Categories", "#categories"],
   ["Flashcards",  "#flashcards"],
-  ["About",       "#about"],
 ];
 
-export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingOut, completedTerms = new Set() }) {
+export function SiteNav({ user, onOpenLogin, onOpenProgress, onOpenAbout, onSignOut, signingOut, completedTerms = new Set() }) {
   const isMobile   = useWindowSize() < 768;
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
@@ -192,7 +191,7 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
 
                 {/* Nav links */}
                 <div style={{ padding: "0 20px 16px" }}>
-                  {NAV_LINKS.map(([label, href]) => (
+                  {ANCHOR_LINKS.map(([label, href]) => (
                     <a
                       key={label} href={href}
                       onClick={() => setMenuOpen(false)}
@@ -202,6 +201,13 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                   ))}
+                  <button
+                    onClick={() => { setMenuOpen(false); onOpenAbout(); }}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", borderBottom: "1px solid #F1F5F9", padding: "14px 4px", fontSize: 17, fontWeight: 600, color: "#1A1A2E", cursor: "pointer", textAlign: "left" }}
+                  >
+                    About
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  </button>
                 </div>
 
                 {/* Conversion section */}
@@ -253,7 +259,7 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
       ) : (
         /* Desktop nav */
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          {NAV_LINKS.map(([item, href]) => (
+          {ANCHOR_LINKS.map(([item, href]) => (
             <a
               key={item} href={href}
               style={{ padding: "6px 12px", borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#64748B", textDecoration: "none", transition: "all 0.15s" }}
@@ -263,6 +269,14 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
               {item}
             </a>
           ))}
+          <button
+            onClick={onOpenAbout}
+            style={{ padding: "6px 12px", borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#64748B", background: "none", border: "none", cursor: "pointer", transition: "all 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#F8FAFC"; e.currentTarget.style.color = "#1A1A2E"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none";    e.currentTarget.style.color = "#64748B"; }}
+          >
+            About
+          </button>
 
           {isLoading ? (
             <div style={{ width: 90, height: 34, borderRadius: 8, background: "#F1F5F9", marginLeft: 8 }}/>

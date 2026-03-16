@@ -1,12 +1,5 @@
-const FOOTER_LINKS = [
-  ["Categories", "#categories"],
-  ["Flashcards",  "#flashcards"],
-  ["About",       "#about"],
-  ["Contact",     "#contact"],
-];
-
-// Site footer with logo, credit, and anchor nav links.
-export function Footer() {
+// Site footer with logo, credit, and nav links.
+export function Footer({ onOpenAbout }) {
   return (
     <footer
       id="contact"
@@ -26,11 +19,9 @@ export function Footer() {
         · delightfuldesign.com.au
       </p>
       <div style={{ display: "flex", gap: 20 }}>
-        {FOOTER_LINKS.map(([item, href]) => (
-          <a key={item} href={href} style={{ fontSize: 13, color: "#94A3B8", textDecoration: "none", fontWeight: 500 }}>
-            {item}
-          </a>
-        ))}
+        <a href="#categories" style={{ fontSize: 13, color: "#94A3B8", textDecoration: "none", fontWeight: 500 }}>Categories</a>
+        <a href="#flashcards"  style={{ fontSize: 13, color: "#94A3B8", textDecoration: "none", fontWeight: 500 }}>Flashcards</a>
+        <button onClick={onOpenAbout} style={{ fontSize: 13, color: "#94A3B8", textDecoration: "none", fontWeight: 500, background: "none", border: "none", cursor: "pointer", padding: 0 }}>About</button>
       </div>
     </footer>
   );
