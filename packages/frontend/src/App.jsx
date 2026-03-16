@@ -24,7 +24,6 @@ import { CATEGORIES }         from "./data/categories.js";
 import { AdSlot }             from "./components/ui/AdSlot.jsx";
 import { TermOfTheDay }       from "./components/ui/TermOfTheDay.jsx";
 import { CategoryPage }       from "./pages/CategoryPage.jsx";
-import { TermPage }           from "./pages/TermPage.jsx";
 import { CategoriesIndexPage } from "./pages/CategoriesIndexPage.jsx";
 import { NotFoundPage }       from "./pages/NotFoundPage.jsx";
 
@@ -221,12 +220,7 @@ export default function App() {
 
         {/* Single category */}
         <Route path="/categories/:categorySlug" element={
-          <CategoryPage completedTerms={completedTerms} user={user}/>
-        }/>
-
-        {/* Single term */}
-        <Route path="/categories/:categorySlug/:termSlug" element={
-          <TermPage completedTerms={completedTerms} onToggleComplete={toggleComplete} user={user}/>
+          <CategoryPage completedTerms={completedTerms} user={user} onOpenDrawer={openDrawer}/>
         }/>
 
         {/* 404 */}

@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { ALL_WORDS } from "../data/words.js";
 import { CATEGORIES } from "../data/categories.js";
-import { findCategoryById, termToSlug } from "../utils/slugs.js";
+import { findCategoryById } from "../utils/slugs.js";
 import { Badge } from "../components/ui/Badge.jsx";
 import { Breadcrumbs } from "../components/ui/Breadcrumbs.jsx";
 import { SEOHead } from "../components/ui/SEOHead.jsx";
 import { ArrowRight } from "lucide-react";
 
-export function CategoryPage({ completedTerms = new Set(), user }) {
+export function CategoryPage({ completedTerms = new Set(), user, onOpenDrawer }) {
   const { categorySlug } = useParams();
-  const navigate = useNavigate();
   const cat = findCategoryById(CATEGORIES, categorySlug);
 
   if (!cat) {
     return (
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
         <SEOHead title="Category not found" description="This category doesn't exist." />
         <h1 style={{ fontSize: 28, fontWeight: 700, fontFamily: "'DM Serif Display', serif", color: "#1A1A2E", marginBottom: 12 }}>Category not found</h1>
         <p style={{ fontSize: 15, color: "#64748B", marginBottom: 24 }}>The category you're looking for doesn't exist.</p>
@@ -28,7 +27,7 @@ export function CategoryPage({ completedTerms = new Set(), user }) {
   const completedCount = words.filter(w => completedTerms.has(w.term)).length;
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: "32px 24px 96px" }}>
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px 96px" }}>
       <SEOHead
         title={`${cat.name} Terms`}
         description={`Learn ${words.length} ${cat.name.toLowerCase()} terms: ${cat.description}. Definitions, examples, and real-world scenarios.`}
@@ -58,7 +57,7 @@ export function CategoryPage({ completedTerms = new Set(), user }) {
       {/* Term list */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {words.map((w) => (
-          <TermListItem key={w.term} word={w} cat={cat} categorySlug={categorySlug} />
+          <TermListItem key={w.term} word={w} cat={cat} onOpen={() => onOpenDrawer(cat)} />
         ))}
       </div>
 
@@ -71,21 +70,25 @@ export function CategoryPage({ completedTerms = new Set(), user }) {
   );
 }
 
-function TermListItem({ word, cat, categorySlug }) {
+function TermListItem({ word, cat, onOpen }) {
   const [hov, setHov] = useState(false);
-  const slug = termToSlug(word.term);
 
   return (
-    <Link
-      to={`/categories/${categorySlug}/${slug}`}
+    <div
+      onClick={onOpen}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === "Enter" && onOpen?.()}
+      aria-label={`Open ${word.term}`}
       style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "16px 18px", borderRadius: 12, gap: 12, textDecoration: "none",
+        padding: "16px 18px", borderRadius: 12, gap: 12,
         border: `1.5px solid ${hov ? cat.accent : "#F1F5F9"}`,
         background: hov ? cat.color : "#FAFAFA",
         cursor: "pointer", transition: "border-color 0.15s, background 0.15s",
+        outline: "none",
       }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -98,6 +101,6 @@ function TermListItem({ word, cat, categorySlug }) {
           <ArrowRight size={13} color={hov ? "#fff" : "#94A3B8"} strokeWidth={2.5} />
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

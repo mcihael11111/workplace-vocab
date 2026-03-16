@@ -13,7 +13,6 @@ const ROOT = resolve(__dirname, "..");
 // Import data by evaluating the JS files (they use named exports)
 // We'll parse the data directly instead
 const categoriesFile = readFileSync(resolve(ROOT, "src/data/categories.js"), "utf-8");
-const wordsFile = readFileSync(resolve(ROOT, "src/data/words.js"), "utf-8");
 
 // Extract category IDs from the categories file
 const catIdRegex = /id:\s*"([^"]+)"/g;
@@ -21,24 +20,6 @@ const categoryIds = [];
 let match;
 while ((match = catIdRegex.exec(categoriesFile)) !== null) {
   categoryIds.push(match[1]);
-}
-
-// Extract term names and their categories from the words file
-const termRegex = /\{\s*term:\s*"([^"]+)",\s*category:\s*"([^"]+)"/g;
-const terms = [];
-while ((match = termRegex.exec(wordsFile)) !== null) {
-  terms.push({ term: match[1], category: match[2] });
-}
-
-// Build a map from category name → category id
-const catNameRegex = /id:\s*"([^"]+)",\s*name:\s*"([^"]+)"/g;
-const catNameToId = {};
-while ((match = catNameRegex.exec(categoriesFile)) !== null) {
-  catNameToId[match[2]] = match[1];
-}
-
-function termToSlug(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
 const DOMAIN = "https://workplacevocab.com";
@@ -64,19 +45,6 @@ for (const id of categoryIds) {
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`);
-}
-
-// Term pages
-for (const { term, category } of terms) {
-  const catId = catNameToId[category];
-  if (!catId) continue;
-  const termSlug = termToSlug(term);
-  urls.push(`  <url>
-    <loc>${DOMAIN}/categories/${catId}/${termSlug}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>`);
 }
 

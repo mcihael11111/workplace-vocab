@@ -7,7 +7,7 @@ export function AboutPage({ onOpenLogin }) {
   return (
     <div style={{ background: "#fff", minHeight: "100vh" }}>
       <SEOHead title="About" description="Workplace Vocab closes the language gap in modern workplaces. Learn the terms that unlock confidence, clarity, and career momentum." />
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 24px 96px" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px 96px" }}>
 
         {/* Back */}
         <Link
