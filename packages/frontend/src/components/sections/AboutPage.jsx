@@ -25,9 +25,17 @@ export function AboutPage({ onOpenLogin }) {
           The vocabulary that<br/>
           <span style={{ fontStyle: "italic", color: "#6366F1" }}>unlocks leadership.</span>
         </h1>
-        <p style={{ fontSize: 18, color: "#475569", lineHeight: 1.75, marginBottom: 64, maxWidth: 620 }}>
-          You know that thing where someone says "north star metric" or "unit economics" in a meeting and everyone nods? And you nod too, but you're already planning to Google it the second you get back to your desk? Yeah. That's the thing this is for.
-        </p>
+        <div style={{ fontSize: 18, color: "#475569", lineHeight: 1.75, marginBottom: 64, maxWidth: 620, display: "flex", flexDirection: "column", gap: 20 }}>
+          <p style={{ margin: 0 }}>
+            Every workplace has its own language — and nobody hands you a dictionary on day one. You're just expected to figure it out from context, from meetings, from that one colleague who drops "TAM" and "burn rate" into every conversation like everyone already knows.
+          </p>
+          <p style={{ margin: 0 }}>
+            The problem isn't that you can't learn it. It's that most resources explain jargon with more jargon, and you end up more confused than when you started. What you actually need is someone to break it down in plain language — the way a good mentor would over coffee.
+          </p>
+          <p style={{ margin: 0 }}>
+            That's what Workplace Vocab does. Over 400 terms across design, product, engineering, business, and more — each one explained clearly, with real context, so the knowledge actually sticks. No fluff. No five-paragraph essays. Just the words you need to walk into any room and hold your own.
+          </p>
+        </div>
 
         <Divider/>
 
