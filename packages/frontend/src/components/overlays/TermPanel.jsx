@@ -90,6 +90,7 @@ export function TermPanel({
     } : {
       top: 0, right: 0, bottom: 0,
       width: "min(560px, 92vw)",
+      borderRadius: "24px 0 0 24px",
       boxShadow: "-24px 0 80px rgba(0,0,0,0.18)",
       animation: "drawerIn 0.3s cubic-bezier(0.32,0.72,0,1)",
     }),
