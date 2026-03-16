@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { ALL_WORDS } from "../../data/words.js";
 
 const ANCHOR_LINKS = [
-  ["Categories", "#categories"],
-  ["Flashcards",  "#flashcards"],
+  ["Categories", "/categories"],
+  ["Flashcards",  "/#flashcards"],
 ];
 
-export function SiteNav({ user, onOpenLogin, onOpenProgress, onOpenAbout, onSignOut, signingOut, completedTerms = new Set() }) {
+export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingOut, completedTerms = new Set() }) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const isMobile   = useWindowSize() < 768;
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
@@ -139,12 +142,12 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onOpenAbout, onSign
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid #F1F5F9", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "inherit" }}>
         <div style={{ width: 28, height: 28, background: "#1A1A2E", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <span style={{ color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "serif" }}>W</span>
         </div>
         <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em" }}>Workplace Vocab</span>
-      </div>
+      </Link>
 
       {isMobile ? (
         <>
@@ -192,22 +195,23 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onOpenAbout, onSign
                 {/* Nav links */}
                 <div style={{ padding: "0 20px 16px" }}>
                   {ANCHOR_LINKS.map(([label, href]) => (
-                    <a
-                      key={label} href={href}
+                    <Link
+                      key={label} to={href}
                       onClick={() => setMenuOpen(false)}
                       style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 4px", fontSize: 17, fontWeight: 600, color: "#1A1A2E", textDecoration: "none", borderBottom: "1px solid #F1F5F9" }}
                     >
                       {label}
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </a>
+                    </Link>
                   ))}
-                  <button
-                    onClick={() => { setMenuOpen(false); onOpenAbout(); }}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", borderBottom: "1px solid #F1F5F9", padding: "14px 4px", fontSize: 17, fontWeight: 600, color: "#1A1A2E", cursor: "pointer", textAlign: "left" }}
+                  <Link
+                    to="/about"
+                    onClick={() => setMenuOpen(false)}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", background: "none", border: "none", borderBottom: "1px solid #F1F5F9", padding: "14px 4px", fontSize: 17, fontWeight: 600, color: "#1A1A2E", cursor: "pointer", textAlign: "left", textDecoration: "none" }}
                   >
                     About
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                  </button>
+                  </Link>
                 </div>
 
                 {/* Conversion section */}
@@ -260,23 +264,23 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onOpenAbout, onSign
         /* Desktop nav */
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           {ANCHOR_LINKS.map(([item, href]) => (
-            <a
-              key={item} href={href}
+            <Link
+              key={item} to={href}
               style={{ padding: "6px 12px", borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#64748B", textDecoration: "none", transition: "all 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.background = "#F8FAFC"; e.currentTarget.style.color = "#1A1A2E"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "none";    e.currentTarget.style.color = "#64748B"; }}
             >
               {item}
-            </a>
+            </Link>
           ))}
-          <button
-            onClick={onOpenAbout}
-            style={{ padding: "6px 12px", borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#64748B", background: "none", border: "none", cursor: "pointer", transition: "all 0.15s" }}
+          <Link
+            to="/about"
+            style={{ padding: "6px 12px", borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#64748B", background: "none", border: "none", cursor: "pointer", transition: "all 0.15s", textDecoration: "none" }}
             onMouseEnter={e => { e.currentTarget.style.background = "#F8FAFC"; e.currentTarget.style.color = "#1A1A2E"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "none";    e.currentTarget.style.color = "#64748B"; }}
           >
             About
-          </button>
+          </Link>
 
           {isLoading ? (
             <div style={{ width: 90, height: 34, borderRadius: 8, background: "#F1F5F9", marginLeft: 8 }}/>

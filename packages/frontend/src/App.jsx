@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { SiteNav }            from "./components/layout/SiteNav.jsx";
 import { Footer }             from "./components/layout/Footer.jsx";
 import { HeroSection }        from "./components/sections/HeroSection.jsx";
@@ -13,6 +14,7 @@ import { TermPanel }          from "./components/overlays/TermPanel.jsx";
 import { FlashcardModal }     from "./components/overlays/FlashcardModal.jsx";
 import { LoginModal }         from "./components/overlays/LoginModal.jsx";
 import { MilestoneSheet }     from "./components/overlays/MilestoneSheet.jsx";
+import { SEOHead }            from "./components/ui/SEOHead.jsx";
 import { useModalState }      from "./hooks/useModalState.js";
 import { useDrawerState }     from "./hooks/useDrawerState.js";
 import { useProgress }        from "./hooks/useProgress.js";
@@ -21,13 +23,26 @@ import { ALL_WORDS }          from "./data/words.js";
 import { CATEGORIES }         from "./data/categories.js";
 import { AdSlot }             from "./components/ui/AdSlot.jsx";
 import { TermOfTheDay }       from "./components/ui/TermOfTheDay.jsx";
+import { CategoryPage }       from "./pages/CategoryPage.jsx";
+import { TermPage }           from "./pages/TermPage.jsx";
+import { CategoriesIndexPage } from "./pages/CategoriesIndexPage.jsx";
+import { NotFoundPage }       from "./pages/NotFoundPage.jsx";
 
 // Daily term is always unlocked regardless of view limit
 const DAILY_TERM_NAME = ALL_WORDS[Math.floor(Date.now() / 86400000) % ALL_WORDS.length]?.term;
 const DAILY_UNLOCKED  = new Set(DAILY_TERM_NAME ? [DAILY_TERM_NAME] : []);
 
+// Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
 export default function App() {
   const { user, signOut, isPro } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [milestone,    setMilestone]    = useState(null);
 
   const handleMilestone = ({ type, streakDays, days }) => {
@@ -53,7 +68,6 @@ export default function App() {
   const [search,       setSearch]       = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   const [activeDomain, setActiveDomain] = useState("All");
-  const [activeView,   setActiveView]   = useState("home");
   const [loginOpen,    setLoginOpen]    = useState(false);
   const [signingOut,   setSigningOut]   = useState(false);
   const [toast,        setToast]        = useState(null);
@@ -106,7 +120,7 @@ export default function App() {
 
   const handleSignOut = async () => {
     setSigningOut(true);
-    setActiveView("home");
+    navigate("/");
     try {
       await signOut();
       showToast({ message: "You've been signed out." });
@@ -119,71 +133,110 @@ export default function App() {
 
   const handleOpenProgress = () => {
     if (!user) { openLogin(); return; }
-    setActiveView("progress");
+    navigate("/progress");
   };
 
-  const handleOpenAbout = () => setActiveView("about");
+  // Determine background based on current route
+  const isSubPage = location.pathname !== "/";
+  const bgColor = (location.pathname === "/progress" || location.pathname === "/about") ? "#F8FAFC" : "#fff";
 
   return (
-    <div style={{ fontFamily: "'DM Sans', -apple-system, sans-serif", background: (activeView === "progress" || activeView === "about") ? "#F8FAFC" : "#fff", color: "#1A1A2E", minHeight: "100vh" }}>
+    <div style={{ fontFamily: "'DM Sans', -apple-system, sans-serif", background: bgColor, color: "#1A1A2E", minHeight: "100vh" }}>
+      <ScrollToTop />
       <SiteNav
         user={user}
         onOpenLogin={openLogin}
         onOpenProgress={handleOpenProgress}
-        onOpenAbout={handleOpenAbout}
         onSignOut={handleSignOut}
         signingOut={signingOut}
         completedTerms={completedTerms}
       />
 
-      {activeView === "about" ? (
-        <AboutPage
-          onGoHome={() => setActiveView("home")}
-          onOpenLogin={openLogin}
-        />
-      ) : activeView === "progress" && user ? (
-        <ProgressSection
-          completedTerms={completedTerms}
-          toggleComplete={toggleComplete}
-          onGoHome={() => setActiveView("home")}
-          onOpenModal={(words, i) => {
-            setActiveView("home");
-            setTimeout(() => openModal(words, i), 50);
-          }}
-        />
-      ) : (
-        <>
-          <HeroSection/>
-          <TermOfTheDay completedTerms={completedTerms} onOpen={openModal}/>
-          {user && (
-            <WelcomeStrip
-              user={user}
+      <Routes>
+        {/* Home */}
+        <Route path="/" element={
+          <>
+            <SEOHead title={null} description="Learn the vocabulary of design, product, engineering, and marketing — one term at a time." />
+            <HeroSection/>
+            <TermOfTheDay completedTerms={completedTerms} onOpen={openModal}/>
+            {user && (
+              <WelcomeStrip
+                user={user}
+                completedTerms={completedTerms}
+                onResume={openModal}
+              />
+            )}
+            <Ticker/>
+            <CategoriesSection
+              search={search}
+              activeDomain={activeDomain}
+              onDomainChange={setActiveDomain}
+              onOpenDrawer={openDrawer}
               completedTerms={completedTerms}
-              onResume={openModal}
+              user={user}
             />
-          )}
-          <Ticker/>
-          <CategoriesSection
-            search={search}
-            activeDomain={activeDomain}
-            onDomainChange={setActiveDomain}
-            onOpenDrawer={openDrawer}
-            completedTerms={completedTerms}
-            user={user}
-          />
-          <AdSlot slot="1205581780"/>
-          <FeaturedSection
-            activeFilter={activeFilter}
-            onFilterChange={setActiveFilter}
-            onOpenModal={openModal}
-            completedTerms={completedTerms}
-          />
-          <CtaSection onOpenLogin={openLogin} onOpenAbout={handleOpenAbout}/>
-          <Footer onOpenAbout={handleOpenAbout}/>
-        </>
-      )}
+            <AdSlot slot="1205581780"/>
+            <FeaturedSection
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+              onOpenModal={openModal}
+              completedTerms={completedTerms}
+            />
+            <CtaSection onOpenLogin={openLogin}/>
+            <Footer/>
+          </>
+        }/>
 
-      {/* Category term panel */}
+        {/* About */}
+        <Route path="/about" element={
+          <AboutPage onOpenLogin={openLogin}/>
+        }/>
+
+        {/* Progress */}
+        <Route path="/progress" element={
+          user ? (
+            <ProgressSection
+              completedTerms={completedTerms}
+              toggleComplete={toggleComplete}
+              onOpenModal={(words, i) => {
+                navigate("/");
+                setTimeout(() => openModal(words, i), 50);
+              }}
+            />
+          ) : (
+            <>
+              <SEOHead title="My Progress" description="Sign in to track your learning progress." />
+              <div style={{ maxWidth: 520, margin: "0 auto", padding: "120px 24px", textAlign: "center" }}>
+                <p style={{ fontSize: 15, color: "#64748B", marginBottom: 16 }}>Sign in to view your progress.</p>
+                <button onClick={openLogin} style={{ background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 10, padding: "12px 28px", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>Sign in</button>
+              </div>
+            </>
+          )
+        }/>
+
+        {/* Categories index */}
+        <Route path="/categories" element={
+          <CategoriesIndexPage completedTerms={completedTerms} user={user}/>
+        }/>
+
+        {/* Single category */}
+        <Route path="/categories/:categorySlug" element={
+          <CategoryPage completedTerms={completedTerms} user={user}/>
+        }/>
+
+        {/* Single term */}
+        <Route path="/categories/:categorySlug/:termSlug" element={
+          <TermPage completedTerms={completedTerms} onToggleComplete={toggleComplete} user={user}/>
+        }/>
+
+        {/* 404 */}
+        <Route path="*" element={<NotFoundPage/>}/>
+      </Routes>
+
+      {/* Footer on sub-pages (home has its own footer in the route) */}
+      {isSubPage && <Footer/>}
+
+      {/* Category term panel (overlay — works on any page) */}
       {drawerCat && (
         <TermPanel
           cat={drawerCat}

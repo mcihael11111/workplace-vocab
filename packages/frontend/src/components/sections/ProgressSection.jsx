@@ -1,13 +1,14 @@
-// ProgressSection — full-page learning dashboard shown when activeView === "progress".
+// ProgressSection — full-page learning dashboard.
 // Displays all categories with per-term completion status.
-// Requires: completedTerms (Set), toggleComplete, onGoHome, onOpenModal
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ALL_WORDS } from "../../data/words.js";
 import { CATEGORIES } from "../../data/categories.js";
 import { Badge } from "../ui/Badge.jsx";
+import { SEOHead } from "../ui/SEOHead.jsx";
 import { Trophy } from "lucide-react";
 
-export function ProgressSection({ completedTerms, toggleComplete, onGoHome, onOpenModal }) {
+export function ProgressSection({ completedTerms, toggleComplete, onOpenModal }) {
   const [expandedCat, setExpandedCat] = useState(null);
 
   const totalTerms     = ALL_WORDS.length;
@@ -22,16 +23,17 @@ export function ProgressSection({ completedTerms, toggleComplete, onGoHome, onOp
 
   return (
     <div style={{ minHeight: "100vh", background: "#F8FAFC" }}>
+      <SEOHead title="My Progress" description="Track your learning progress across all vocabulary categories." />
 
       {/* Header */}
       <div style={{ background: "#fff", borderBottom: "1px solid #F1F5F9", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 60, zIndex: 50 }}>
-        <button
-          onClick={onGoHome}
-          style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#64748B", padding: "6px 0" }}
+        <Link
+          to="/"
+          style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 600, color: "#64748B", padding: "6px 0", textDecoration: "none" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
           Back to home
-        </button>
+        </Link>
         <span style={{ fontSize: 13, fontWeight: 600, color: "#94A3B8" }}>
           {totalCompleted} / {totalTerms} terms complete
         </span>

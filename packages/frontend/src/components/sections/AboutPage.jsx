@@ -1,18 +1,21 @@
+import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import { SEOHead } from "../ui/SEOHead.jsx";
 
-// Full-page About view. Rendered when activeView === "about".
-export function AboutPage({ onGoHome, onOpenLogin }) {
+// Full-page About view.
+export function AboutPage({ onOpenLogin }) {
   return (
     <div style={{ background: "#fff", minHeight: "100vh" }}>
+      <SEOHead title="About" description="Workplace Vocab closes the language gap in modern workplaces. Learn the terms that unlock confidence, clarity, and career momentum." />
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 24px 96px" }}>
 
         {/* Back */}
-        <button
-          onClick={onGoHome}
-          style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, fontWeight: 600, padding: "0 0 40px", marginBottom: 0 }}
+        <Link
+          to="/"
+          style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", color: "#64748B", fontSize: 14, fontWeight: 600, padding: "0 0 40px", marginBottom: 0, textDecoration: "none" }}
         >
           <ChevronLeft size={15} strokeWidth={2.5}/> Back to home
-        </button>
+        </Link>
 
         {/* Hero */}
         <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#6366F1", marginBottom: 16 }}>
@@ -104,12 +107,12 @@ export function AboutPage({ onGoHome, onOpenLogin }) {
             >
               Start learning — it's free
             </button>
-            <button
-              onClick={onGoHome}
-              style={{ background: "none", color: "#64748B", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "13px 24px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}
+            <Link
+              to="/categories"
+              style={{ background: "none", color: "#64748B", border: "1.5px solid #E2E8F0", borderRadius: 12, padding: "13px 24px", fontSize: 15, fontWeight: 600, cursor: "pointer", textDecoration: "none", display: "inline-block" }}
             >
               Browse terms
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -119,7 +122,7 @@ export function AboutPage({ onGoHome, onOpenLogin }) {
 }
 
 function Divider() {
-  return <div style={{ height: 1, background: "#F1F5F9", margin: "48px 0" }}/>;
+  return <div style={{ height: 1, background: "#F1F5F9", margin: "16px 0" }}/>;
 }
 
 function Section({ label, children }) {

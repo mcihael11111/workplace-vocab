@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
+
 // Dark navy CTA block shown above the footer. Entry point to the About page.
-export function CtaSection({ onOpenLogin, onOpenAbout }) {
+export function CtaSection({ onOpenLogin }) {
   return (
     <section
       id="about"
@@ -27,18 +29,18 @@ export function CtaSection({ onOpenLogin, onOpenAbout }) {
           >
             Start learning →
           </button>
-          <button
-            onClick={() => document.getElementById("categories")?.scrollIntoView({ behavior: "smooth" })}
-            style={{ background: "none", color: "#64748B", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px 28px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}
+          <Link
+            to="/categories"
+            style={{ background: "none", color: "#64748B", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 10, padding: "13px 28px", fontSize: 15, fontWeight: 600, cursor: "pointer", textDecoration: "none", textAlign: "center" }}
           >
             Browse all categories
-          </button>
-          <button
-            onClick={onOpenAbout}
+          </Link>
+          <Link
+            to="/about"
             style={{ background: "none", color: "#475569", border: "none", padding: "8px 0", fontSize: 14, fontWeight: 500, cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}
           >
             Our story →
-          </button>
+          </Link>
         </div>
       </div>
     </section>
