@@ -14,7 +14,7 @@ export function CategoryPage({ completedTerms = new Set(), user, onOpenModal }) 
 
   if (!cat) {
     return (
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
         <SEOHead title="Category not found" description="This category doesn't exist." />
         <h1 style={{ fontSize: 28, fontWeight: 700, fontFamily: "'DM Serif Display', serif", color: "#1A1A2E", marginBottom: 12 }}>Category not found</h1>
         <p style={{ fontSize: 15, color: "#64748B", marginBottom: 24 }}>The category you're looking for doesn't exist.</p>
@@ -27,7 +27,7 @@ export function CategoryPage({ completedTerms = new Set(), user, onOpenModal }) 
   const completedCount = words.filter(w => completedTerms.has(w.term)).length;
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px 96px" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px 96px" }}>
       <SEOHead
         title={`${cat.name} Terms`}
         description={`Learn ${words.length} ${cat.name.toLowerCase()} terms: ${cat.description}. Definitions, examples, and real-world scenarios.`}
