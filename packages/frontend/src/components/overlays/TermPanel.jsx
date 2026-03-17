@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, Inbox } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Inbox } from "lucide-react";
 import { Badge }        from "../ui/Badge.jsx";
 import { RelatedChip }  from "../ui/RelatedChip.jsx";
 import { CAT_MAP, findTermByName } from "../../utils/termLookup.js";
@@ -34,6 +34,10 @@ export function TermPanel({
   const dragPrevY    = useRef(null);
   const dragVelocity = useRef(0);
   const isDragging   = useRef(false);
+
+  // ── Horizontal swipe state (detail view) ──────────────────────────────────
+  const swipeStartX = useRef(null);
+  const swipeStartY = useRef(null);
 
   // Apply transform directly to DOM — bypasses React render loop for 60fps
   const applyTransform = (offsetY) => {
@@ -83,8 +87,34 @@ export function TermPanel({
     dragStartY.current = null;
   };
 
-  // ── Scroll-area drag handoff (non-passive so we can preventDefault) ────────
-  // When content is at scroll-top and user drags down → hand off to sheet drag.
+  // ── Prev / Next navigation helpers ──────────────────────────────────────────
+  const goPrev = useCallback(() => {
+    if (activeIndex > 0) setActiveIndex(i => i - 1);
+  }, [activeIndex]);
+  const goNext = useCallback(() => {
+    if (activeIndex < words.length - 1) setActiveIndex(i => i + 1);
+  }, [activeIndex, words.length]);
+
+  // ── Horizontal swipe on detail body ───────────────────────────────────────
+  const onSwipeTouchStart = (e) => {
+    swipeStartX.current = e.touches[0].clientX;
+    swipeStartY.current = e.touches[0].clientY;
+  };
+  const onSwipeTouchEnd = (e) => {
+    if (swipeStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - swipeStartX.current;
+    const dy = e.changedTouches[0].clientY - swipeStartY.current;
+    // Only fire if gesture is predominantly horizontal (dx dominates by 1.5×)
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      dx < 0 ? goNext() : goPrev();
+    }
+    swipeStartX.current = null;
+    swipeStartY.current = null;
+  };
+
+  // ── Scroll-area drag handoff (list screen only) ──────────────────────────
+  // Vertical drag-to-dismiss only on the list scroll area.
+  // Detail scroll area uses horizontal swipe instead.
   useEffect(() => {
     if (!isMobile) return;
 
@@ -92,7 +122,7 @@ export function TermPanel({
       dragStartY.current   = e.touches[0].clientY;
       dragPrevY.current    = e.touches[0].clientY;
       dragVelocity.current = 0;
-      isDragging.current   = false; // not yet — wait for downward move at top
+      isDragging.current   = false;
     };
 
     const onScrollTouchMove = (e) => {
@@ -103,15 +133,13 @@ export function TermPanel({
       dragPrevY.current    = y;
 
       if (!isDragging.current) {
-        // Start sheet drag only when pulling down from the very top
         if (dy > 6 && scrollEl.scrollTop <= 0) {
           isDragging.current   = true;
-          dragStartY.current   = y; // reset origin so drag starts from here
+          dragStartY.current   = y;
         }
-        return; // let scroll behave normally otherwise
+        return;
       }
 
-      // Actively dragging the sheet — prevent scroll
       e.preventDefault();
       applyTransform(Math.max(0, y - dragStartY.current));
     };
@@ -129,25 +157,17 @@ export function TermPanel({
     const opts    = { passive: false };
     const optsP   = { passive: true  };
     const listEl  = listScrollRef.current;
-    const detailEl = detailScrollRef.current;
 
     listEl?.addEventListener("touchstart", onScrollTouchStart, optsP);
     listEl?.addEventListener("touchmove",  onScrollTouchMove,  opts);
     listEl?.addEventListener("touchend",   onScrollTouchEnd,   optsP);
 
-    detailEl?.addEventListener("touchstart", onScrollTouchStart, optsP);
-    detailEl?.addEventListener("touchmove",  onScrollTouchMove,  opts);
-    detailEl?.addEventListener("touchend",   onScrollTouchEnd,   optsP);
-
     return () => {
       listEl?.removeEventListener("touchstart", onScrollTouchStart);
       listEl?.removeEventListener("touchmove",  onScrollTouchMove);
       listEl?.removeEventListener("touchend",   onScrollTouchEnd);
-      detailEl?.removeEventListener("touchstart", onScrollTouchStart);
-      detailEl?.removeEventListener("touchmove",  onScrollTouchMove);
-      detailEl?.removeEventListener("touchend",   onScrollTouchEnd);
     };
-  }, [isMobile, isExpanded]); // re-bind when isExpanded changes so snapOrClose captures correct value
+  }, [isMobile, isExpanded]);
 
   // Lock body scroll
   useEffect(() => {
@@ -155,16 +175,21 @@ export function TermPanel({
     return () => { document.body.style.overflow = ""; };
   }, []);
 
-  // Keyboard
+  // Keyboard — Escape, ← →
   useEffect(() => {
     const h = e => {
-      if (e.key !== "Escape") return;
-      if (view === "detail") { setView("list"); setIsExpanded(false); }
-      else onClose();
+      if (e.key === "Escape") {
+        if (view === "detail") { setView("list"); setIsExpanded(false); }
+        else onClose();
+      }
+      if (view === "detail") {
+        if (e.key === "ArrowLeft")  goPrev();
+        if (e.key === "ArrowRight") goNext();
+      }
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [view, onClose]);
+  }, [view, onClose, goPrev, goNext]);
 
   const word   = words[activeIndex];
   const locked = word && !isPro && isViewLimitReached
@@ -328,6 +353,15 @@ export function TermPanel({
                     <span style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", whiteSpace: "nowrap" }}>{activeIndex + 1} / {words.length}</span>
                     <CloseBtn/>
                   </div>
+
+                  {/* Prev / Next arrows */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                    <NavArrow direction="left" disabled={activeIndex === 0} onClick={goPrev} accent={cat.accent}/>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8" }}>
+                      {isMobile ? "Swipe or tap to navigate" : "← → to navigate"}
+                    </span>
+                    <NavArrow direction="right" disabled={activeIndex === words.length - 1} onClick={goNext} accent={cat.accent}/>
+                  </div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: wordCat.color, borderRadius: 6 }}>
@@ -364,6 +398,8 @@ export function TermPanel({
                 ) : (
                   <div
                     ref={detailScrollRef}
+                    onTouchStart={onSwipeTouchStart}
+                    onTouchEnd={onSwipeTouchEnd}
                     style={{ flex: 1, overflowY: "auto", padding: `16px ${P}px 20px`, WebkitOverflowScrolling: "touch" }}
                   >
                     <section style={{ marginBottom: 16 }}>
@@ -436,6 +472,28 @@ export function TermPanel({
         </div>
       </div>
     </>
+  );
+}
+
+// ─── Nav arrow ────────────────────────────────────────────────────────────────
+function NavArrow({ direction, disabled, onClick, accent }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onClick={onClick} disabled={disabled} aria-label={direction === "left" ? "Previous term" : "Next term"}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
+        border: `1.5px solid ${disabled ? "#E2E8F0" : hov ? accent : "#E2E8F0"}`,
+        background: disabled ? "#F8FAFC" : hov ? accent : "#F8FAFC",
+        cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1,
+        transition: "all 0.15s", flexShrink: 0,
+      }}
+    >
+      {direction === "left"
+        ? <ChevronLeft size={16} color={disabled ? "#94A3B8" : hov ? "#fff" : "#475569"} strokeWidth={2.5}/>
+        : <ChevronRight size={16} color={disabled ? "#94A3B8" : hov ? "#fff" : "#475569"} strokeWidth={2.5}/>}
+    </button>
   );
 }
 
