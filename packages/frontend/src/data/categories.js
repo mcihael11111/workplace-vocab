@@ -1,5 +1,5 @@
 // ─── CATEGORIES ─────────────────────────────────────────────────────────────
-// 25 categories across 6 domains.
+// 30 categories across 7 domains.
 // Shape: { id, name, domain, count, color, accent, icon, description }
 // icon — a Lucide React component, rendered as <cat.icon size={N} color={cat.accent} />
 
@@ -11,6 +11,7 @@ import {
   Fingerprint, Target, Smartphone, Megaphone,
   Wallet, Rocket, Building2,
   Copyright, FileText, ShieldCheck,
+  BrainCircuit, Sparkles, Wand2, Cpu, ShieldAlert,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -47,6 +48,12 @@ const CATEGORIES = [
   { id: "intellectual-property", name: "Intellectual Property", domain: "Legal",        count: 8,  color: "#FFF7ED", accent: "#C2410C", icon: Copyright,     description: "Copyright, trademark, patent, licensing, IP ownership" },
   { id: "contracts-agreements", name: "Contracts & Agreements", domain: "Legal",        count: 10, color: "#FEF3C7", accent: "#D97706", icon: FileText,      description: "NDA, contracts, SLA, indemnity, equity, shareholder agreements" },
   { id: "compliance-data",      name: "Compliance & Data",    domain: "Legal",          count: 10, color: "#FFF1F2", accent: "#E11D48", icon: ShieldCheck,   description: "GDPR, privacy policy, compliance, data retention, acceptable use" },
+  // ── AI & Machine Learning ──────────────────────────────────────────────────
+  { id: "ai-foundations",        name: "AI Foundations",        domain: "AI & Machine Learning", count: 18, color: "#EFF6FF", accent: "#3B82F6", icon: BrainCircuit,  description: "Machine learning, neural networks, training, supervised & unsupervised learning" },
+  { id: "generative-ai",        name: "Generative AI",         domain: "AI & Machine Learning", count: 20, color: "#FDF4FF", accent: "#A855F7", icon: Sparkles,      description: "LLMs, prompts, tokens, hallucination, fine-tuning, diffusion models" },
+  { id: "ai-product-design",    name: "AI Product & Design",   domain: "AI & Machine Learning", count: 15, color: "#F0FDF4", accent: "#10B981", icon: Wand2,         description: "Human-in-the-loop, explainability, AI UX patterns, trust calibration" },
+  { id: "ai-engineering",       name: "AI Engineering",        domain: "AI & Machine Learning", count: 12, color: "#FFF7ED", accent: "#F97316", icon: Cpu,           description: "Inference, embeddings, RAG, vector databases, model deployment" },
+  { id: "ai-ethics-safety",     name: "AI Ethics & Safety",    domain: "AI & Machine Learning", count: 10, color: "#FEF2F2", accent: "#EF4444", icon: ShieldAlert,   description: "Bias, fairness, alignment, responsible AI, regulation" },
 ];
 
 export { CATEGORIES };

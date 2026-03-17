@@ -11,6 +11,7 @@ const FEATURED_TERMS = [
   "Value Proposition",   // Marketing
   "Burn Rate",           // Finance
   "NDA",                 // Legal
+  "Hallucination",       // AI & Machine Learning
 ];
 
 const FEATURED_WORDS = ALL_WORDS.filter(w => FEATURED_TERMS.includes(w.term));
