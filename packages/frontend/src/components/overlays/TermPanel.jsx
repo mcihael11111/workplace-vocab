@@ -40,6 +40,18 @@ export function TermPanel({
   const swipeStartX = useRef(null);
   const swipeStartY = useRef(null);
 
+  const word   = words[activeIndex];
+  const locked = word && !isPro && isViewLimitReached
+    && !viewedTerms.has(word.term)
+    && !unlockedTerms?.has(word.term);
+  const isDone  = word && completedTerms.has(word.term);
+  const wordCat = (word && CAT_MAP[word.category]) || { accent: cat.accent, color: cat.color, icon: BookOpen };
+
+  const { handleScroll: acScroll, trackAccordion, flush: acFlush } = useAutoComplete(
+    word?.term,
+    { isComplete: isDone, onComplete: () => word && onMarkComplete?.(word.term) },
+  );
+
   // Apply transform directly to DOM — bypasses React render loop for 60fps
   const applyTransform = (offsetY) => {
     if (!panelRef.current) return;
@@ -193,11 +205,6 @@ export function TermPanel({
     return () => window.removeEventListener("keydown", h);
   }, [view, onClose, goPrev, goNext]);
 
-  const word   = words[activeIndex];
-  const locked = word && !isPro && isViewLimitReached
-    && !viewedTerms.has(word.term)
-    && !unlockedTerms?.has(word.term);
-
   useEffect(() => {
     if (view !== "detail" || !word) return;
     setScenarioOpen(false);
@@ -218,14 +225,6 @@ export function TermPanel({
     setView("detail");
     if (isMobile) setIsExpanded(true);
   }
-
-  const isDone  = word && completedTerms.has(word.term);
-  const wordCat = (word && CAT_MAP[word.category]) || { accent: cat.accent, color: cat.color, icon: BookOpen };
-
-  const { handleScroll: acScroll, trackAccordion, flush: acFlush } = useAutoComplete(
-    word?.term,
-    { isComplete: isDone, onComplete: () => word && onMarkComplete?.(word.term) },
-  );
 
   // ── Panel shell ───────────────────────────────────────────────────────────
   const panelStyle = {
