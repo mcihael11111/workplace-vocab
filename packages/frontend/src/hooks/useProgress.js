@@ -2,7 +2,7 @@
 // Firestore path: users/{uid}/progress/data
 //
 // Free tier: users can view up to FREE_VIEW_LIMIT unique cards.
-//   After that, new cards are locked behind an upgrade wall.
+//   After hitting the limit, views reset after RESET_DAYS days.
 //   Already-viewed cards can always be re-opened.
 //
 // Gamification:
@@ -20,11 +20,13 @@ import { db } from "../firebase.js";
 
 export const DAILY_GOAL      = 3;
 export const FREE_VIEW_LIMIT = 9;   // unique cards before paywall
+export const RESET_DAYS      = 5;   // days until free views reset
 export const CONFETTI_AT     = 3;   // celebrate on 3rd unique view
 
 const STREAK_MILESTONES  = new Set([3, 7, 14, 30, 60, 100]);
 const GUEST_KEY          = "wv_guest_progress";
 const GUEST_VIEWS_KEY    = "wv_guest_views";
+const GUEST_LIMIT_DATE   = "wv_guest_limit_date";
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function yesterdayStr() {
@@ -37,19 +39,35 @@ function loadGuest(key) {
   catch { return []; }
 }
 
+function daysSince(dateStr) {
+  if (!dateStr) return Infinity;
+  const diff = Date.now() - new Date(dateStr).getTime();
+  return diff / (1000 * 60 * 60 * 24);
+}
+
 export function useProgress(user, { onMilestone, onNudge } = {}) {
-  const [completedTerms,   setCompletedTerms]   = useState(() => new Set(loadGuest(GUEST_KEY)));
-  const [viewedTerms,      setViewedTerms]      = useState(() => new Set(loadGuest(GUEST_VIEWS_KEY)));
-  const [streakDays,       setStreakDays]       = useState(0);
-  const [longestStreak,    setLongestStreak]    = useState(0);
-  const [todayCount,       setTodayCount]       = useState(0);
-  const [lastActivityDate, setLastActivityDate] = useState(null);
+  const [completedTerms,      setCompletedTerms]      = useState(() => new Set(loadGuest(GUEST_KEY)));
+  const [viewedTerms,         setViewedTerms]         = useState(() => new Set(loadGuest(GUEST_VIEWS_KEY)));
+  const [viewLimitReachedAt,  setViewLimitReachedAt]  = useState(() => localStorage.getItem(GUEST_LIMIT_DATE) || null);
+  const [streakDays,          setStreakDays]          = useState(0);
+  const [longestStreak,       setLongestStreak]       = useState(0);
+  const [todayCount,          setTodayCount]          = useState(0);
+  const [lastActivityDate,    setLastActivityDate]    = useState(null);
 
   // ── Load on login ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) {
+      const guestLimitDate = localStorage.getItem(GUEST_LIMIT_DATE);
+      if (guestLimitDate && daysSince(guestLimitDate) >= RESET_DAYS) {
+        localStorage.removeItem(GUEST_VIEWS_KEY);
+        localStorage.removeItem(GUEST_LIMIT_DATE);
+        setViewedTerms(new Set());
+        setViewLimitReachedAt(null);
+      } else {
+        setViewedTerms(new Set(loadGuest(GUEST_VIEWS_KEY)));
+        setViewLimitReachedAt(guestLimitDate);
+      }
       setCompletedTerms(new Set(loadGuest(GUEST_KEY)));
-      setViewedTerms(new Set(loadGuest(GUEST_VIEWS_KEY)));
       setStreakDays(0); setLongestStreak(0); setTodayCount(0); setLastActivityDate(null);
       return;
     }
@@ -63,10 +81,19 @@ export function useProgress(user, { onMilestone, onNudge } = {}) {
       const existing = snap.exists() ? snap.data() : {};
 
       const merged      = [...new Set([...(existing.completedTerms || []), ...guestTerms])];
-      const mergedViews = [...new Set([...(existing.viewedTerms    || []), ...guestViews])];
+      let   mergedViews = [...new Set([...(existing.viewedTerms    || []), ...guestViews])];
+      let   limitDate   = existing.viewLimitReachedAt || null;
+
+      // Reset views if 5 days have passed since limit was reached
+      if (limitDate && daysSince(limitDate) >= RESET_DAYS) {
+        mergedViews = [];
+        limitDate   = null;
+        updateDoc(ref, { viewedTerms: [], viewLimitReachedAt: null }).catch(() => {});
+      }
 
       setCompletedTerms(new Set(merged));
       setViewedTerms(new Set(mergedViews));
+      setViewLimitReachedAt(limitDate);
       setStreakDays(existing.streakDays || 0);
       setLongestStreak(existing.longestStreak || 0);
       setLastActivityDate(existing.lastActivityDate || null);
@@ -77,6 +104,7 @@ export function useProgress(user, { onMilestone, onNudge } = {}) {
         setDoc(ref, { ...existing, completedTerms: merged, viewedTerms: mergedViews }, { merge: true });
         localStorage.removeItem(GUEST_KEY);
         localStorage.removeItem(GUEST_VIEWS_KEY);
+        localStorage.removeItem(GUEST_LIMIT_DATE);
       }
     });
   }, [user?.uid]);
@@ -95,9 +123,21 @@ export function useProgress(user, { onMilestone, onNudge } = {}) {
       onMilestone?.({ type: "confetti", count: newViewed.size });
     }
 
+    // Record the date when view limit is first reached
+    if (newViewed.size >= FREE_VIEW_LIMIT && !viewLimitReachedAt) {
+      const now = new Date().toISOString();
+      setViewLimitReachedAt(now);
+
+      if (!user) {
+        localStorage.setItem(GUEST_LIMIT_DATE, now);
+      } else {
+        const ref = doc(db, "users", user.uid, "progress", "data");
+        updateDoc(ref, { viewLimitReachedAt: now }).catch(() => {});
+      }
+    }
+
     if (!user) {
       localStorage.setItem(GUEST_VIEWS_KEY, JSON.stringify([...newViewed]));
-      // Nudge after free limit is reached
       if (newViewed.size === NUDGE_AT) onNudge?.();
       return;
     }
@@ -171,11 +211,23 @@ export function useProgress(user, { onMilestone, onNudge } = {}) {
     }
   }
 
+  // ── Mark complete (one-way, used by auto-complete) ─────────────────────
+  async function markComplete(termName) {
+    if (completedTerms.has(termName)) return;
+    toggleComplete(termName);
+  }
+
+  // Compute when the limit will reset (null if not yet reached)
+  const resetDate = viewLimitReachedAt
+    ? new Date(new Date(viewLimitReachedAt).getTime() + RESET_DAYS * 24 * 60 * 60 * 1000)
+    : null;
+
   return {
-    completedTerms, toggleComplete,
+    completedTerms, toggleComplete, markComplete,
     viewedTerms, trackView,
     viewedCount: viewedTerms.size,
     isViewLimitReached: viewedTerms.size >= FREE_VIEW_LIMIT,
+    resetDate,
     streakDays, longestStreak, todayCount,
   };
 }

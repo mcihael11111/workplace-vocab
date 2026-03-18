@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { Badge } from "../ui/Badge.jsx";
 import { RelatedChip } from "../ui/RelatedChip.jsx";
-import { ChevronBtn } from "../ui/ChevronBtn.jsx";
 import { CAT_MAP, findTermByName, isTermLocked } from "../../utils/termLookup.js";
-import { BookOpen } from "lucide-react";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
+import { useAutoComplete } from "../../hooks/useAutoComplete.js";
 
 // Full flashcard overlay.
 // Desktop: centred modal with fixed ChevronBtns.
@@ -12,7 +12,7 @@ import { useWindowSize } from "../../hooks/useWindowSize.js";
 //   - Swipe left/right on body → prev/next (Y-axis guarded to avoid false triggers)
 //   - Drag handle + compact sticky header (when scrolled) → swipe down → close
 //   - All touch targets ≥ 44×44px (WCAG 2.5.5)
-export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, unlockedTerms, viewedTerms = new Set(), isViewLimitReached = false, onView, user, completedTerms = new Set(), onToggleComplete }) {
+export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, unlockedTerms, viewedTerms = new Set(), isViewLimitReached = false, onView, user, completedTerms = new Set(), onToggleComplete, onMarkComplete }) {
   const word   = words[activeIndex];
   // Locked if: not Pro, limit reached, term never viewed before, and not the daily term override
   const locked = !isPro && isViewLimitReached && !viewedTerms.has(word.term) && !unlockedTerms?.has(word.term);
@@ -25,6 +25,16 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
   const [conversationOpen, setConversationOpen] = useState(false);
   const [bodyScrolled,    setBodyScrolled]    = useState(false);
 
+  const { handleScroll: acScroll, trackAccordion, flush: acFlush } = useAutoComplete(
+    word.term,
+    { isComplete: isDone, onComplete: () => onMarkComplete?.(word.term) },
+  );
+
+  // Wrap nav callbacks to flush engagement before leaving card
+  const wrappedPrev  = useCallback(() => { acFlush(); onPrev(); },  [acFlush, onPrev]);
+  const wrappedNext  = useCallback(() => { acFlush(); onNext(); },  [acFlush, onNext]);
+  const wrappedClose = useCallback(() => { acFlush(); onClose(); }, [acFlush, onClose]);
+
   useEffect(() => {
     setScenarioOpen(false);
     setConversationOpen(false);
@@ -36,11 +46,11 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
   // Keyboard nav (desktop)
   useEffect(() => {
     const h = e => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") wrappedClose();
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [onClose]);
+  }, [wrappedClose]);
 
   // Lock scroll on body
   useEffect(() => {
@@ -66,7 +76,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
     const dy = e.changedTouches[0].clientY - touchStartY.current;
     // Only fire if gesture is predominantly horizontal (dx dominates by 1.5×)
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      dx < 0 ? onNext() : onPrev();
+      dx < 0 ? wrappedNext() : wrappedPrev();
     }
     touchStartX.current = null;
     touchStartY.current = null;
@@ -82,17 +92,20 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
   const handleDismissTouchEnd = e => {
     if (dismissStartY.current === null) return;
     const dy = e.changedTouches[0].clientY - dismissStartY.current;
-    if (dy > 60) onClose();
+    if (dy > 60) wrappedClose();
     dismissStartY.current = null;
   };
 
   // ── Body scroll tracking ──────────────────────────────────────────────────
-  const handleBodyScroll = e => setBodyScrolled(e.target.scrollTop > 80);
+  const handleBodyScroll = e => {
+    setBodyScrolled(e.target.scrollTop > 80);
+    acScroll(e);
+  };
 
   return (
     <>
       <div
-        onClick={onClose}
+        onClick={wrappedClose}
         style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(10,15,30,0.72)", backdropFilter: "blur(8px)", animation: "overlayIn 0.2s ease forwards" }}
       />
 
@@ -191,7 +204,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
               <Badge level={word.level}/>
               {/* Close button — 44×44px touch target (WCAG 2.5.5) */}
               <button
-                onClick={onClose}
+                onClick={wrappedClose}
                 aria-label="Close card"
                 style={{ width: 44, height: 44, borderRadius: 8, background: "#F8FAFC", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
               >
@@ -232,7 +245,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
         ) : (
           <div
             ref={scrollRef}
-            onScroll={isMobile ? handleBodyScroll : undefined}
+            onScroll={isMobile ? handleBodyScroll : acScroll}
             style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px 24px" : "24px 24px 24px" }}
           >
             <section style={{ marginBottom: 16 }}>
@@ -247,7 +260,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
             <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
             {/* Example accordion — 44px touch target */}
             <section style={{ marginBottom: 12, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
-              <button onClick={() => setScenarioOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: scenarioOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
+              <button onClick={() => { setScenarioOpen(o => !o); trackAccordion(); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: scenarioOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
                 <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>Example</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: scenarioOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
                   <path d="M6 9l6 6 6-6"/>
@@ -262,7 +275,7 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
             <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
             {/* Conversation accordion — 44px touch target */}
             <section style={{ marginBottom: 16, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
-              <button onClick={() => setConversationOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: conversationOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
+              <button onClick={() => { setConversationOpen(o => !o); trackAccordion(); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: conversationOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
                 <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>In a real conversation</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "rotate(0deg)", flexShrink: 0 }}>
                   <path d="M6 9l6 6 6-6"/>
@@ -297,20 +310,50 @@ export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, on
           </div>
         )}
 
-        {/* ── Footer ─────────────────────────────────────────────────────── */}
-        {user && (
-          <div style={{ padding: isMobile ? "10px 16px" : "14px 28px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "center", alignItems: "center", flexShrink: 0, background: "#FAFAFA" }}>
+        {/* ── Footer: nav + status ─────────────────────────────────────── */}
+        {!locked && (
+          <div style={{ padding: isMobile ? "8px 12px" : "10px 28px", paddingBottom: isMobile ? "calc(8px + env(safe-area-inset-bottom, 0px))" : "10px", borderTop: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexShrink: 0, background: "#FAFAFA" }}>
+            <NavArrow direction="left" disabled={activeIndex === 0} onClick={wrappedPrev} accent={cat.accent}/>
             <button
-              onClick={() => onToggleComplete(word.term)}
-              aria-label={isDone ? "Mark as not done" : "Mark as done"}
-              style={{ display: "flex", alignItems: "center", gap: 6, border: `1.5px solid ${isDone ? "#22C55E" : "#E2E8F0"}`, borderRadius: 8, padding: "0 20px", height: 44, fontSize: 13, fontWeight: 600, cursor: "pointer", background: isDone ? "#F0FDF4" : "#fff", color: isDone ? "#16A34A" : "#64748B", transition: "all 0.15s", whiteSpace: "nowrap" }}
+              onClick={() => onToggleComplete?.(word.term)}
+              style={{
+                flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                background: isDone ? "#F0FDF4" : "#F8FAFC",
+                border: `1.5px solid ${isDone ? "#BBF7D0" : "#E2E8F0"}`,
+                borderRadius: 10, padding: "8px 12px", minHeight: 36,
+                fontSize: 13, fontWeight: 700, color: isDone ? "#16A34A" : "#64748B",
+                cursor: "pointer", transition: "all 0.15s", userSelect: "none",
+              }}
             >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-              {isDone ? "Completed" : "Mark done"}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isDone ? "#16A34A" : "#94A3B8"} strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+              {isDone ? "Completed" : "Mark complete"}
             </button>
+            <NavArrow direction="right" disabled={activeIndex === total - 1} onClick={wrappedNext} accent={cat.accent}/>
           </div>
         )}
       </div>
     </>
+  );
+}
+
+// ─── Nav arrow ────────────────────────────────────────────────────────────────
+function NavArrow({ direction, disabled, onClick, accent }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onClick={onClick} disabled={disabled} aria-label={direction === "left" ? "Previous term" : "Next term"}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        width: 36, height: 36, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center",
+        border: `1.5px solid ${disabled ? "#E2E8F0" : hov ? accent : "#E2E8F0"}`,
+        background: disabled ? "#F8FAFC" : hov ? accent : "#F8FAFC",
+        cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.4 : 1,
+        transition: "all 0.15s", flexShrink: 0,
+      }}
+    >
+      {direction === "left"
+        ? <ChevronLeft size={16} color={disabled ? "#94A3B8" : hov ? "#fff" : "#475569"} strokeWidth={2.5}/>
+        : <ChevronRight size={16} color={disabled ? "#94A3B8" : hov ? "#fff" : "#475569"} strokeWidth={2.5}/>}
+    </button>
   );
 }

@@ -4,6 +4,7 @@ import { Badge }        from "../ui/Badge.jsx";
 import { RelatedChip }  from "../ui/RelatedChip.jsx";
 import { CAT_MAP, findTermByName } from "../../utils/termLookup.js";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
+import { useAutoComplete } from "../../hooks/useAutoComplete.js";
 import { ALL_WORDS }    from "../../data/words.js";
 import { BookOpen }     from "lucide-react";
 
@@ -14,7 +15,7 @@ export function TermPanel({
   cat, onClose, startIndex = null,
   isPro = false, unlockedTerms, viewedTerms = new Set(),
   isViewLimitReached = false, onView,
-  user, completedTerms = new Set(), onToggleComplete, onUpgrade,
+  user, completedTerms = new Set(), onToggleComplete, onMarkComplete, onUpgrade,
 }) {
   const words    = ALL_WORDS.filter(w => w.category === cat.name);
   const isMobile = useWindowSize() < 768;
@@ -53,6 +54,7 @@ export function TermPanel({
 
   const snapOrClose = (isExpandedCurrent) => {
     applyTransform(0);
+    if (view === "detail") acFlush();
     if (isExpandedCurrent) {
       setIsExpanded(false);
       if (listScrollRef.current)   listScrollRef.current.scrollTop   = 0;
@@ -89,11 +91,11 @@ export function TermPanel({
 
   // ── Prev / Next navigation helpers ──────────────────────────────────────────
   const goPrev = useCallback(() => {
-    if (activeIndex > 0) setActiveIndex(i => i - 1);
-  }, [activeIndex]);
+    if (activeIndex > 0) { acFlush(); setActiveIndex(i => i - 1); }
+  }, [activeIndex, acFlush]);
   const goNext = useCallback(() => {
-    if (activeIndex < words.length - 1) setActiveIndex(i => i + 1);
-  }, [activeIndex, words.length]);
+    if (activeIndex < words.length - 1) { acFlush(); setActiveIndex(i => i + 1); }
+  }, [activeIndex, words.length, acFlush]);
 
   // ── Horizontal swipe on detail body ───────────────────────────────────────
   const onSwipeTouchStart = (e) => {
@@ -220,6 +222,11 @@ export function TermPanel({
   const isDone  = word && completedTerms.has(word.term);
   const wordCat = (word && CAT_MAP[word.category]) || { accent: cat.accent, color: cat.color, icon: BookOpen };
 
+  const { handleScroll: acScroll, trackAccordion, flush: acFlush } = useAutoComplete(
+    word?.term,
+    { isComplete: isDone, onComplete: () => word && onMarkComplete?.(word.term) },
+  );
+
   // ── Panel shell ───────────────────────────────────────────────────────────
   const panelStyle = {
     position: "fixed", background: "#fff", zIndex: 910,
@@ -341,7 +348,7 @@ export function TermPanel({
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <button
-                      onClick={() => { setView("list"); setIsExpanded(false); }}
+                      onClick={() => { acFlush(); setView("list"); setIsExpanded(false); }}
                       aria-label="Back to list"
                       style={{ display: "flex", alignItems: "center", gap: 3, background: "none", border: "none", cursor: "pointer", color: "#64748B", padding: "4px 0", fontSize: 13, fontWeight: 600, flexShrink: 0, whiteSpace: "nowrap" }}
                     >
@@ -354,14 +361,6 @@ export function TermPanel({
                     <CloseBtn/>
                   </div>
 
-                  {/* Prev / Next arrows */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                    <NavArrow direction="left" disabled={activeIndex === 0} onClick={goPrev} accent={cat.accent}/>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8" }}>
-                      {isMobile ? "Swipe or tap to navigate" : "← → to navigate"}
-                    </span>
-                    <NavArrow direction="right" disabled={activeIndex === words.length - 1} onClick={goNext} accent={cat.accent}/>
-                  </div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", background: wordCat.color, borderRadius: 6 }}>
@@ -400,6 +399,7 @@ export function TermPanel({
                     ref={detailScrollRef}
                     onTouchStart={onSwipeTouchStart}
                     onTouchEnd={onSwipeTouchEnd}
+                    onScroll={acScroll}
                     style={{ flex: 1, overflowY: "auto", padding: `16px ${P}px 20px`, WebkitOverflowScrolling: "touch" }}
                   >
                     <section style={{ marginBottom: 16 }}>
@@ -413,7 +413,7 @@ export function TermPanel({
                     </section>
                     <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
                     <section style={{ marginBottom: 12, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
-                      <button onClick={() => setScenarioOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: scenarioOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
+                      <button onClick={() => { setScenarioOpen(o => !o); trackAccordion(); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: scenarioOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>Example</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: scenarioOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}><path d="M6 9l6 6 6-6"/></svg>
                       </button>
@@ -425,7 +425,7 @@ export function TermPanel({
                     </section>
                     <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
                     <section style={{ marginBottom: 16, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
-                      <button onClick={() => setConversationOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: conversationOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
+                      <button onClick={() => { setConversationOpen(o => !o); trackAccordion(); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: conversationOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#475569" }}>In a real conversation</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: conversationOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}><path d="M6 9l6 6 6-6"/></svg>
                       </button>
@@ -454,16 +454,24 @@ export function TermPanel({
                   </div>
                 )}
 
-                {user && !locked && (
-                  <div style={{ padding: isMobile ? "10px 16px" : "12px 28px", paddingBottom: isMobile ? "calc(10px + env(safe-area-inset-bottom, 0px))" : "12px", borderTop: "1px solid #F1F5F9", display: "flex", justifyContent: "center", flexShrink: 0, background: "#FAFAFA" }}>
+                {!locked && (
+                  <div style={{ padding: isMobile ? "8px 12px" : "10px 28px", paddingBottom: isMobile ? "calc(8px + env(safe-area-inset-bottom, 0px))" : "10px", borderTop: "1px solid #F1F5F9", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexShrink: 0, background: "#FAFAFA" }}>
+                    <NavArrow direction="left" disabled={activeIndex === 0} onClick={goPrev} accent={cat.accent}/>
                     <button
-                      onClick={() => onToggleComplete(word.term)}
-                      aria-label={isDone ? "Mark as not done" : "Mark as done"}
-                      style={{ display: "flex", alignItems: "center", gap: 6, border: `1.5px solid ${isDone ? "#22C55E" : "#E2E8F0"}`, borderRadius: 8, padding: "0 20px", height: 44, fontSize: 13, fontWeight: 600, cursor: "pointer", background: isDone ? "#F0FDF4" : "#fff", color: isDone ? "#16A34A" : "#64748B", transition: "all 0.15s" }}
+                      onClick={() => onToggleComplete?.(word.term)}
+                      style={{
+                        flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                        background: isDone ? "#F0FDF4" : "#F8FAFC",
+                        border: `1.5px solid ${isDone ? "#BBF7D0" : "#E2E8F0"}`,
+                        borderRadius: 10, padding: "8px 12px", minHeight: 36,
+                        fontSize: 13, fontWeight: 700, color: isDone ? "#16A34A" : "#64748B",
+                        cursor: "pointer", transition: "all 0.15s", userSelect: "none",
+                      }}
                     >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
-                      {isDone ? "Completed" : "Mark done"}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isDone ? "#16A34A" : "#94A3B8"} strokeWidth="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+                      {isDone ? "Completed" : "Mark complete"}
                     </button>
+                    <NavArrow direction="right" disabled={activeIndex === words.length - 1} onClick={goNext} accent={cat.accent}/>
                   </div>
                 )}
               </>

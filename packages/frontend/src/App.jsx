@@ -59,7 +59,7 @@ export default function App() {
   };
 
   const {
-    completedTerms, toggleComplete,
+    completedTerms, toggleComplete, markComplete,
     viewedTerms, trackView, isViewLimitReached,
     streakDays, longestStreak, todayCount,
   } = useProgress(user, { onMilestone: handleMilestone, onNudge: handleNudge });
@@ -244,6 +244,7 @@ export default function App() {
           user={user}
           completedTerms={completedTerms}
           onToggleComplete={toggleComplete}
+          onMarkComplete={markComplete}
           onUpgrade={handleUpgrade}
         />
       )}
@@ -266,6 +267,7 @@ export default function App() {
           user={user}
           completedTerms={completedTerms}
           onToggleComplete={toggleComplete}
+          onMarkComplete={markComplete}
         />
       )}
 
