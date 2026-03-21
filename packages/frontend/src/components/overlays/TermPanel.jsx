@@ -310,7 +310,19 @@ export function TermPanel({
                 </div>
                 <CloseBtn/>
               </div>
-              <p style={{ fontSize: 13, color: "#64748B", margin: 0, lineHeight: 1.5 }}>{cat.description}</p>
+              <p style={{ fontSize: 13, color: "#64748B", margin: "0 0 0", lineHeight: 1.5 }}>{cat.description}</p>
+              {cat.psychology && (
+                <div style={{ background: `linear-gradient(135deg, ${cat.color}, #fff)`, border: `1.5px solid ${cat.accent}22`, borderRadius: 10, padding: "12px 14px", marginTop: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={cat.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/>
+                      <path d="M10 21h4"/>
+                    </svg>
+                    <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: cat.accent }}>Psychology</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: "#334155", lineHeight: 1.6, margin: 0 }}>{cat.psychology}</p>
+                </div>
+              )}
             </div>
 
             {/* List body — scroll handoff handled by useEffect */}
@@ -410,6 +422,21 @@ export function TermPanel({
                       <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 10 }}>Why it matters</p>
                       <p style={{ fontSize: 16, color: "#1E293B", lineHeight: 1.72, margin: 0 }}>{word.whyItMatters}</p>
                     </section>
+                    {word.psychology && (
+                      <>
+                        <div style={{ height: 1, background: "#F1F5F9", marginBottom: 16 }}/>
+                        <section style={{ marginBottom: 16, background: `linear-gradient(135deg, ${wordCat.color}, #fff)`, border: `1.5px solid ${wordCat.accent}22`, borderRadius: 12, padding: "14px 16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 10 }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={wordCat.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/>
+                              <path d="M10 21h4"/>
+                            </svg>
+                            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: wordCat.accent }}>Psychology</span>
+                          </div>
+                          <p style={{ fontSize: 15, color: "#334155", lineHeight: 1.72, margin: 0 }}>{word.psychology}</p>
+                        </section>
+                      </>
+                    )}
                     <div style={{ height: 1, background: "#F1F5F9", marginBottom: 12 }}/>
                     <section style={{ marginBottom: 12, border: "1.5px solid #E2E8F0", borderRadius: 10, overflow: "hidden" }}>
                       <button onClick={() => { setScenarioOpen(o => !o); trackAccordion(); }} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", background: scenarioOpen ? "#F1F5F9" : "#F8FAFC", border: "none", padding: "14px 16px", cursor: "pointer", minHeight: 44 }}>

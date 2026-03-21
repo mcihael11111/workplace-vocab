@@ -50,9 +50,29 @@ export function CategoryPage({ completedTerms = new Set(), user, onOpenDrawer })
         </div>
       </div>
       <p style={{ fontSize: 16, color: "#64748B", lineHeight: 1.6, marginBottom: 8, maxWidth: 600 }}>{cat.description}</p>
-      <p style={{ fontSize: 13, color: "#94A3B8", fontWeight: 600, marginBottom: 32 }}>
+      <p style={{ fontSize: 13, color: "#94A3B8", fontWeight: 600, marginBottom: cat.psychology ? 20 : 32 }}>
         {words.length} terms{user ? ` · ${completedCount} completed` : ""}
       </p>
+
+      {cat.psychology && (
+        <div style={{
+          background: `linear-gradient(135deg, ${cat.color}, #fff)`,
+          border: `1.5px solid ${cat.accent}22`,
+          borderRadius: 14,
+          padding: "18px 20px",
+          marginBottom: 32,
+          maxWidth: 680,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={cat.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/>
+              <path d="M10 21h4"/>
+            </svg>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: cat.accent }}>Psychology</span>
+          </div>
+          <p style={{ fontSize: 14, color: "#334155", lineHeight: 1.7, margin: 0 }}>{cat.psychology}</p>
+        </div>
+      )}
 
       {/* Term list */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

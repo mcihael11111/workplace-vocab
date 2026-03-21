@@ -141,6 +141,26 @@ These patterns appear consistently in poorly written cards. Check every card aga
 
 ---
 
+### 6. Psychology (optional)
+
+This section names the specific psychological principle that explains why this concept works the way it does.
+
+Not every card needs one. Include it when a named, well-established psychology principle adds a layer of insight that the definition and why-it-matters sections do not cover. Skip it for purely technical terms, role descriptions, and cases where the connection would feel forced.
+
+**Length:** One to three sentences.
+
+**How to write it well:**
+
+Name the principle explicitly: "Loss Aversion", "The Zeigarnik Effect", "Cognitive Load Theory". The reader should walk away with a specific concept they can look up and apply elsewhere.
+
+Explain how the principle connects to the term. Do not just name the principle. Show why it matters in this context. The psychology should change how the reader thinks about or applies the concept.
+
+Avoid repeating what is already in the definition or why-it-matters sections. The psychology section should add something new, not restate the same point in psychological language.
+
+Good candidates for psychology include: design patterns with cognitive roots, marketing tactics built on behavioural economics, business metrics that exploit bias, UX patterns that rely on attention or memory, and any term where understanding the underlying human behaviour changes how you use it.
+
+---
+
 ## Cross-checking definitions
 
 Every definition should be verified before it is finalised. This means checking the term against at least one authoritative source: Nielsen Norman Group, Interaction Design Foundation, or an established book in the field.

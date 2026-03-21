@@ -17,7 +17,8 @@ Every term object has these fields:
   whyItMatters: "...",         // Why someone should care
   scenario: "...",             // A concrete story showing the concept in action
   example: "\"...\"",          // A sentence someone might say in a real workplace
-  related: ["Term A", "Term B", "Term C", "Term D"]  // 3–5 related terms
+  related: ["Term A", "Term B", "Term C", "Term D"],  // 3–5 related terms
+  psychology: "..."            // Optional — the psychological principle behind the concept
 }
 ```
 
@@ -63,6 +64,14 @@ Every term object has these fields:
 - Prioritise terms the reader would naturally want to explore next.
 - Mix categories where possible — cross-linking between categories is valuable.
 
+### Psychology (optional)
+- **1–3 sentences.** Name the specific psychological principle that underpins or explains this concept.
+- Only include when a genuine, named psychology principle applies. Not every term needs one.
+- Name the principle explicitly (e.g. "Loss Aversion", "Mere Exposure Effect", "Cognitive Load Theory") so the reader gains a specific concept they can research further.
+- Focus on insight the reader would not otherwise have. The psychology should add a layer of understanding that the definition and why-it-matters sections do not cover.
+- Skip psychology for purely technical terms (CSS, API, GPU), pure role descriptions, and terms where the connection would feel forced.
+- Good candidates: design patterns with cognitive roots, marketing tactics built on behavioural economics, business metrics that exploit bias, and any term where understanding the underlying human behaviour changes how you apply the concept.
+
 ---
 
 ## Voice & Tone
@@ -94,12 +103,13 @@ Each category in the `CATEGORIES` array:
 {
   id: "kebab-case-id",
   name: "Display Name",
-  domain: "Domain Name",       // Product Design | Engineering | Business | Marketing | Strategy | Operations
+  domain: "Domain Name",       // Product Design | Engineering | Business | Marketing | Finance | Legal | AI & Machine Learning
   count: 10,                   // Number of terms in this category
   color: "#F0F9FF",            // Light background colour (pastel)
   accent: "#0EA5E9",           // Bold accent colour for badges/borders
-  icon: "📈",                  // Emoji icon (or Lucide icon name if migrated)
-  description: "Short phrase listing 4–5 key terms in the category"
+  icon: Microscope,            // Lucide React icon component
+  description: "Short phrase listing 4–5 key terms in the category",
+  psychology: "The psychological principles underpinning this category"  // 2–4 sentences
 }
 ```
 
