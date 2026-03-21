@@ -1,5 +1,5 @@
 // ─── CATEGORIES ─────────────────────────────────────────────────────────────
-// 32 categories across 7 domains.
+// 37 categories across 8 domains.
 // Shape: { id, name, domain, count, color, accent, icon, description, psychology }
 // icon — a Lucide React component, rendered as <cat.icon size={N} color={cat.accent} />
 
@@ -12,6 +12,7 @@ import {
   Wallet, Rocket, Building2,
   Copyright, FileText, ShieldCheck,
   BrainCircuit, Sparkles, Wand2, Cpu, ShieldAlert,
+  Brain, Eye, HandHeart, Scale, UsersRound,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -117,6 +118,21 @@ const CATEGORIES = [
 
   { id: "ai-ethics-safety",     name: "AI Ethics & Safety",    domain: "AI & Machine Learning", count: 10, color: "#FEF2F2", accent: "#EF4444", icon: ShieldAlert,   description: "Bias, fairness, alignment, responsible AI, regulation",
     psychology: "Algorithmic Aversion means people lose trust in AI after one mistake more drastically than they would with a human making the same error. Mathematical fairness (equal error rates) and perceived fairness (does this feel fair to me?) often diverge. The Moral Responsibility Gap means when AI causes harm, nobody feels accountable. Deepfakes create a \"liar's dividend\" where even authentic content becomes suspect, eroding trust in all media." },
+  // ── Psychology ──────────────────────────────────────────────────────────────
+  { id: "cognitive-biases",      name: "Cognitive Biases",      domain: "Psychology", count: 10, color: "#F3E8FF", accent: "#7C3AED", icon: Brain,        description: "Mental shortcuts and systematic errors in thinking that affect decisions, judgments, and perception",
+    psychology: "The brain processes roughly 11 million bits of sensory information per second but can only consciously handle about 50. Cognitive biases are the shortcuts evolution built to bridge this gap. They are not flaws but features: fast, energy-efficient, and correct often enough to have kept humans alive. The problem is that modern environments (digital products, financial markets, hiring decisions) exploit these shortcuts in ways the brain never evolved to handle." },
+
+  { id: "body-language",         name: "Body Language",         domain: "Psychology", count: 10, color: "#FCE7F3", accent: "#DB2777", icon: Eye,          description: "Non-verbal cues, micro-expressions, posture, and physical signals that reveal thoughts and emotions",
+    psychology: "Albert Mehrabian's research suggests that in emotionally ambiguous communication, 55% of meaning comes from body language, 38% from tone, and only 7% from words. While these numbers are frequently over-generalised, the core finding holds: when words and body language conflict, people instinctively trust the body. Micro-expressions flash across the face in 1/25th of a second and are nearly impossible to fake, making them one of the most reliable signals of true emotional state." },
+
+  { id: "persuasion-influence",  name: "Persuasion & Influence", domain: "Psychology", count: 10, color: "#DBEAFE", accent: "#2563EB", icon: HandHeart,    description: "Techniques and principles that shape decisions, change minds, and drive behaviour",
+    psychology: "Robert Cialdini identified six universal principles of influence: Reciprocity, Commitment & Consistency, Social Proof, Authority, Liking, and Scarcity. These work because they exploit deeply wired social instincts. Persuasion is not manipulation when used transparently: a doctor using authority to encourage vaccination, a charity using reciprocity to drive donations, or a designer using social proof to reduce user anxiety are all ethical applications of the same principles." },
+
+  { id: "behavioural-economics", name: "Behavioural Economics", domain: "Psychology", count: 10, color: "#D1FAE5", accent: "#059669", icon: Scale,        description: "How psychological factors cause people to make irrational financial and economic decisions",
+    psychology: "Classical economics assumes people are rational actors who maximise utility. Behavioural economics, pioneered by Kahneman and Tversky, proved this assumption wrong. People value losses roughly twice as much as equivalent gains. They anchor to irrelevant numbers. They choose differently depending on how options are framed, even when the outcomes are identical. Understanding these patterns is essential for anyone designing products, pricing, or experiences that involve human decision-making." },
+
+  { id: "social-psychology",     name: "Social Psychology",     domain: "Psychology", count: 10, color: "#FEF3C7", accent: "#D97706", icon: UsersRound,   description: "How people think, feel, and behave in groups and social situations",
+    psychology: "Humans are fundamentally social animals. Solomon Asch showed that people will deny their own eyes to conform with a group. Stanley Milgram demonstrated that ordinary people will inflict harm when instructed by an authority figure. Philip Zimbardo's Stanford Prison Experiment revealed how quickly roles and power dynamics reshape behaviour. These are not edge cases: they are core features of human psychology that play out daily in workplaces, products, and communities." },
 ];
 
 export { CATEGORIES };
