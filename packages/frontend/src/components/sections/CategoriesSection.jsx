@@ -1,49 +1,103 @@
-import { CategoryCard } from "../cards/CategoryCard.jsx";
-import { Search } from "lucide-react";
-import { FilterPills } from "../ui/FilterPills.jsx";
-import { DOMAINS } from "../../data/domains.js";
-import { filterCategories } from "../../utils/filterUtils.js";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { CATEGORIES } from "../../data/categories.js";
-import { ALL_WORDS } from "../../data/words.js";
+import { DomainCarousel } from "./DomainCarousel.jsx";
+import { DomainSection } from "./DomainSection.jsx";
 
-// Category grid section with domain filter pills and search-driven heading.
-export function CategoriesSection({ search, activeDomain, onDomainChange, onOpenDrawer, completedTerms = new Set(), user }) {
-  const filteredCats = filterCategories(CATEGORIES, activeDomain, search);
+// Build domain objects: { name, categories, totalTerms }
+const domainNames = [...new Set(CATEGORIES.map(c => c.domain))];
+const DOMAIN_LIST = domainNames.map(name => {
+  const categories = CATEGORIES.filter(c => c.domain === name);
+  return { name, categories, totalTerms: categories.reduce((s, c) => s + c.count, 0) };
+});
+
+const INITIAL_COUNT = 3;   // domains visible on first render
+const LOAD_BATCH   = 2;    // domains added per scroll
+
+// Sectioned category browser: domain carousel → domain sections → infinite scroll
+export function CategoriesSection({ onOpenDrawer, completedTerms = new Set(), user }) {
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+  const sentinelRef = useRef(null);
+
+  // IntersectionObserver for infinite scroll
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisibleCount(prev => Math.min(prev + LOAD_BATCH, DOMAIN_LIST.length));
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [visibleCount]); // re-observe when count changes (sentinel may move)
+
+  const visibleDomains = DOMAIN_LIST.slice(0, visibleCount);
+  const hasMore = visibleCount < DOMAIN_LIST.length;
+
+  // Scroll to a domain section when clicked in carousel
+  const handleDomainClick = useCallback((domainName) => {
+    const idx = DOMAIN_LIST.findIndex(d => d.name === domainName);
+    // Make sure the domain is loaded
+    if (idx >= visibleCount) {
+      setVisibleCount(Math.min(idx + 2, DOMAIN_LIST.length));
+    }
+    // Scroll after a tick to allow render
+    requestAnimationFrame(() => {
+      const slug = domainName.toLowerCase().replace(/\s+/g, "-");
+      const el = document.getElementById(`domain-${slug}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }, [visibleCount]);
 
   return (
     <section
       id="categories"
-      style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(40px,7vw,72px) 24px 0" }}
+      style={{ maxWidth: 1200, margin: "0 auto", padding: "clamp(40px,7vw,72px) 0 0" }}
     >
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
-        <div>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#94A3B8", marginBottom: 8 }}>Browse by category</p>
-          <h2 style={{ fontSize: 30, fontWeight: 700, letterSpacing: "-0.03em", fontFamily: "'DM Serif Display', serif" }}>
-            {search
-              ? `${filteredCats.length} categories found`
-              : activeDomain !== "All"
-                ? activeDomain
-                : "Every area of practice"}
-          </h2>
-        </div>
-        <FilterPills options={DOMAINS} active={activeDomain} onChange={onDomainChange}/>
+      {/* Domain carousel */}
+      <DomainCarousel domains={DOMAIN_LIST} onDomainClick={handleDomainClick} />
+
+      {/* Domain sections */}
+      <div style={{ padding: "48px 24px 0", maxWidth: 1200, margin: "0 auto" }}>
+        {visibleDomains.map((domain) => (
+          <DomainSection
+            key={domain.name}
+            domain={domain}
+            onOpenDrawer={onOpenDrawer}
+            completedTerms={completedTerms}
+            user={user}
+          />
+        ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(220px, 100%), 1fr))", gap: 14, alignItems: "start" }}>
-        {filteredCats.map((cat) => {
-          const catWords = user ? ALL_WORDS.filter(w => w.category === cat.name) : [];
-          const completedCount = user ? catWords.filter(w => completedTerms.has(w.term)).length : undefined;
-          const totalCount     = user ? catWords.length : undefined;
-          return (
-            <CategoryCard key={cat.id} cat={cat} onClick={() => onOpenDrawer(cat)} completedCount={completedCount} totalCount={totalCount}/>
-          );
-        })}
-      </div>
-      {search && filteredCats.length === 0 && (
-        <div style={{ textAlign: "center", padding: "60px 24px", color: "#94A3B8", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-          <Search size={32} color="#CBD5E1" strokeWidth={1.5} />
-          <p style={{ fontSize: 16, fontWeight: 500, margin: 0 }}>No categories match "{search}"</p>
+
+      {/* Sentinel for infinite scroll */}
+      {hasMore && (
+        <div ref={sentinelRef} style={{ padding: "32px 0", textAlign: "center" }}>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            color: "#94A3B8", fontSize: 13, fontWeight: 500,
+          }}>
+            <Spinner /> Loading more domains…
+          </div>
         </div>
       )}
     </section>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" style={{ animation: "spin 0.8s linear infinite" }}>
+      <circle cx="8" cy="8" r="6" fill="none" stroke="#CBD5E1" strokeWidth="2" />
+      <path d="M8 2a6 6 0 0 1 6 6" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </svg>
   );
 }

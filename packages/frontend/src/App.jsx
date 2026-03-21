@@ -167,9 +167,6 @@ export default function App() {
             )}
             <Ticker/>
             <CategoriesSection
-              search={search}
-              activeDomain={activeDomain}
-              onDomainChange={setActiveDomain}
               onOpenDrawer={openDrawer}
               completedTerms={completedTerms}
               user={user}
