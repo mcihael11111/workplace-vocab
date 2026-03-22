@@ -83,7 +83,7 @@ export function DomainCarousel({ domains, onDomainClick }) {
         style={{
           display: "flex", gap: 14, overflowX: "auto", scrollSnapType: "x mandatory",
           scrollbarWidth: "none", msOverflowStyle: "none",
-          paddingBottom: 4,
+          padding: "8px 0",
         }}
       >
         {domains.map((d) => (

@@ -73,7 +73,7 @@ export function DomainSection({ domain, onOpenDrawer, completedTerms, user }) {
           scrollSnapType: "x mandatory",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
-          paddingBottom: 4,
+          padding: "8px 0",
         }}
       >
         {domain.categories.map((cat) => {
