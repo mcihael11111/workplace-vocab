@@ -1,5 +1,5 @@
 // ─── CATEGORIES ─────────────────────────────────────────────────────────────
-// 37 categories across 8 domains.
+// 42 categories across 8 domains.
 // Shape: { id, name, domain, count, color, accent, icon, description, psychology }
 // icon — a Lucide React component, rendered as <cat.icon size={N} color={cat.accent} />
 
@@ -13,6 +13,7 @@ import {
   Copyright, FileText, ShieldCheck,
   BrainCircuit, Sparkles, Wand2, Cpu, ShieldAlert,
   Brain, Eye, HandHeart, Scale, UsersRound,
+  Paintbrush, BarChart3, MousePointer2, Crown, BookOpen,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -133,6 +134,22 @@ const CATEGORIES = [
 
   { id: "social-psychology",     name: "Social Psychology",     domain: "Psychology", count: 10, color: "#FEF3C7", accent: "#D97706", icon: UsersRound,   description: "How people think, feel, and behave in groups and social situations",
     psychology: "Humans are fundamentally social animals. Solomon Asch showed that people will deny their own eyes to conform with a group. Stanley Milgram demonstrated that ordinary people will inflict harm when instructed by an authority figure. Philip Zimbardo's Stanford Prison Experiment revealed how quickly roles and power dynamics reshape behaviour. These are not edge cases: they are core features of human psychology that play out daily in workplaces, products, and communities." },
+
+  // ── Psychology: Applied ────────────────────────────────────────────────────
+  { id: "psych-graphic-design",  name: "Psychology of Graphic Design",  domain: "Psychology", count: 10, color: "#FFF0F6", accent: "#C026D3", icon: Paintbrush,     description: "How colour, typography, layout, and visual elements affect perception, emotion, and behaviour",
+    psychology: "Every visual choice triggers a psychological response. Colour activates the limbic system before the conscious mind can intervene. Typefaces carry personality that readers absorb unconsciously. The brain organises visual information using Gestalt principles that evolved for survival — grouping, proximity, and figure-ground — and designers who understand these mechanisms create work that feels effortless to process." },
+
+  { id: "psych-marketing",       name: "Psychology of Marketing",       domain: "Psychology", count: 10, color: "#FFF5F5", accent: "#E11D48", icon: BarChart3,       description: "Psychological triggers, biases, and emotional drivers that make marketing persuasive",
+    psychology: "Marketing works because it speaks to the emotional brain first and the rational brain second. People do not buy products — they buy better versions of themselves. Every effective campaign exploits at least one psychological principle: scarcity creates urgency, social proof reduces risk, nostalgia triggers warm affect, and storytelling bypasses analytical resistance. Understanding these mechanisms is the difference between marketing that interrupts and marketing that resonates." },
+
+  { id: "psych-product-design",  name: "Psychology of Product Design",  domain: "Psychology", count: 10, color: "#EFF6FF", accent: "#2563EB", icon: MousePointer2,   description: "Cognitive principles that govern how people interact with digital products and interfaces",
+    psychology: "Every interaction with a product is a conversation between the user's cognitive limits and the designer's choices. Working memory holds roughly four chunks at a time. Decision-making degrades with every additional option. Users form expectations in milliseconds and abandon products that violate them. The best product design does not add intelligence — it removes friction by aligning with how the brain already works." },
+
+  { id: "psych-leadership",      name: "Psychology of Leadership",      domain: "Psychology", count: 10, color: "#FFFBEB", accent: "#B45309", icon: Crown,           description: "How psychological principles shape effective leadership, team dynamics, and organisational culture",
+    psychology: "Leadership is applied psychology. Every management decision — how feedback is delivered, how goals are set, how autonomy is granted — triggers predictable psychological responses. Teams with psychological safety outperform teams with star individuals. Leaders who understand intrinsic motivation build cultures that sustain themselves. The most common leadership failures are not strategic — they are psychological: groupthink, ego, and the inability to create environments where people can do their best work." },
+
+  { id: "psych-learning",        name: "Psychology of Learning",        domain: "Psychology", count: 10, color: "#F0FDF4", accent: "#15803D", icon: BookOpen,        description: "How the brain acquires, retains, and retrieves knowledge — the science behind effective learning",
+    psychology: "The brain is not a recording device — it is a pattern-matching engine that strengthens connections through retrieval, not repetition. Re-reading feels productive but produces weak memories. Testing feels harder but produces durable ones. Spacing study sessions exploits how forgetting curves work. The most effective learners are not those who study the hardest but those who study in alignment with how memory actually functions." },
 ];
 
 export { CATEGORIES };
