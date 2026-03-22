@@ -51,28 +51,28 @@ export function DomainCarousel({ domains, onDomainClick }) {
             disabled={!canScrollLeft}
             aria-label="Scroll left"
             style={{
-              width: 36, height: 36, borderRadius: "50%", border: "1.5px solid #E2E8F0",
-              background: canScrollLeft ? "#fff" : "#F8FAFC",
+              width: 30, height: 30, borderRadius: "50%", border: "1.5px solid #E2E8F0",
+              background: "#fff",
               cursor: canScrollLeft ? "pointer" : "default",
               display: "flex", alignItems: "center", justifyContent: "center",
-              opacity: canScrollLeft ? 1 : 0.4, transition: "opacity 0.15s",
+              opacity: canScrollLeft ? 1 : 0.35, transition: "opacity 0.15s",
             }}
           >
-            <ChevronLeft size={18} color="#1A1A2E" strokeWidth={2} />
+            <ChevronLeft size={15} color="#1A1A2E" strokeWidth={2} />
           </button>
           <button
             onClick={() => scroll(1)}
             disabled={!canScrollRight}
             aria-label="Scroll right"
             style={{
-              width: 36, height: 36, borderRadius: "50%", border: "1.5px solid #E2E8F0",
-              background: canScrollRight ? "#1A1A2E" : "#F8FAFC",
+              width: 30, height: 30, borderRadius: "50%", border: "1.5px solid #E2E8F0",
+              background: canScrollRight ? "#1A1A2E" : "#fff",
               cursor: canScrollRight ? "pointer" : "default",
               display: "flex", alignItems: "center", justifyContent: "center",
-              opacity: canScrollRight ? 1 : 0.4, transition: "opacity 0.15s",
+              opacity: canScrollRight ? 1 : 0.35, transition: "opacity 0.15s",
             }}
           >
-            <ChevronRight size={18} color={canScrollRight ? "#fff" : "#1A1A2E"} strokeWidth={2} />
+            <ChevronRight size={15} color={canScrollRight ? "#fff" : "#1A1A2E"} strokeWidth={2} />
           </button>
         </div>
       </div>
