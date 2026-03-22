@@ -230,8 +230,10 @@ export default function App() {
       {/* Category term panel (overlay — works on any page) */}
       {drawerCat && (
         <TermPanel
+          key={drawerCat.id}
           cat={drawerCat}
           onClose={closeDrawer}
+          onOpenCategory={openDrawer}
           startIndex={drawerStartIndex}
           isPro={isPro}
           unlockedTerms={DAILY_UNLOCKED}

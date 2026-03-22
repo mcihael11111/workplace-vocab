@@ -6,13 +6,30 @@ import { CAT_MAP, findTermByName } from "../../utils/termLookup.js";
 import { useWindowSize } from "../../hooks/useWindowSize.js";
 import { useAutoComplete } from "../../hooks/useAutoComplete.js";
 import { ALL_WORDS }    from "../../data/words.js";
+import { CATEGORIES }   from "../../data/categories.js";
 import { BookOpen }     from "lucide-react";
 
 // TermPanel — category list (screen 1) + flashcard detail (screen 2).
 // Mobile: smooth real-time drag gesture (sheet follows finger), scroll-area handoff.
 // Inspired by Google Maps / Apple Maps bottom sheet pattern.
+// Map domains to their applied Psychology subcategory
+const PSYCH_MAP = {
+  "Product Design": "psych-product-design",
+  "Engineering":    "psych-product-design",
+  "Business":       "psych-leadership",
+  "Marketing":      "psych-marketing",
+  "Finance":        "behavioural-economics",
+  "Legal":          "persuasion-influence",
+  "AI & Machine Learning": "cognitive-biases",
+};
+
+function findPsychCategory(domain) {
+  const id = PSYCH_MAP[domain];
+  return id ? CATEGORIES.find(c => c.id === id) : null;
+}
+
 export function TermPanel({
-  cat, onClose, startIndex = null,
+  cat, onClose, onOpenCategory, startIndex = null,
   isPro = false, unlockedTerms, viewedTerms = new Set(),
   isViewLimitReached = false, onView,
   user, completedTerms = new Set(), onToggleComplete, onMarkComplete, onUpgrade,
@@ -326,9 +343,17 @@ export function TermPanel({
                     </div>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={cat.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: catPsychOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}><path d="M6 9l6 6 6-6"/></svg>
                   </button>
-                  <div style={{ overflow: "hidden", maxHeight: catPsychOpen ? "400px" : 0, transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: catPsychOpen ? 1 : 0 }}>
+                  <div style={{ overflow: "hidden", maxHeight: catPsychOpen ? "500px" : 0, transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: catPsychOpen ? 1 : 0 }}>
                     <div style={{ padding: "10px 14px", background: `linear-gradient(135deg, ${cat.color}, #fff)` }}>
                       <p style={{ fontSize: 12, color: "#334155", lineHeight: 1.6, margin: 0 }}>{cat.psychology}</p>
+                      {cat.domain !== "Psychology" && (() => { const pc = findPsychCategory(cat.domain); return pc && onOpenCategory ? (
+                        <button onClick={() => onOpenCategory(pc)} style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 10, background: "none", border: `1.5px solid ${cat.accent}33`, borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 11, fontWeight: 600, color: cat.accent, transition: "background 0.15s" }}
+                          onMouseEnter={e => e.currentTarget.style.background = `${cat.accent}0D`}
+                          onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                          More details
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
+                      ) : null; })()}
                     </div>
                   </div>
                 </div>
@@ -446,9 +471,17 @@ export function TermPanel({
                             </div>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={wordCat.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: wordPsychOpen ? "rotate(180deg)" : "none", flexShrink: 0 }}><path d="M6 9l6 6 6-6"/></svg>
                           </button>
-                          <div style={{ overflow: "hidden", maxHeight: wordPsychOpen ? "600px" : 0, transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: wordPsychOpen ? 1 : 0 }}>
+                          <div style={{ overflow: "hidden", maxHeight: wordPsychOpen ? "700px" : 0, transition: "max-height 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease", opacity: wordPsychOpen ? 1 : 0 }}>
                             <div style={{ padding: "14px 16px", background: `linear-gradient(135deg, ${wordCat.color}, #fff)` }}>
                               <p style={{ fontSize: 15, color: "#334155", lineHeight: 1.72, margin: 0 }}>{word.psychology}</p>
+                              {wordCat.domain !== "Psychology" && (() => { const pc = findPsychCategory(wordCat.domain); return pc && onOpenCategory ? (
+                                <button onClick={() => onOpenCategory(pc)} style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 12, background: "none", border: `1.5px solid ${wordCat.accent}33`, borderRadius: 8, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600, color: wordCat.accent, transition: "background 0.15s" }}
+                                  onMouseEnter={e => e.currentTarget.style.background = `${wordCat.accent}0D`}
+                                  onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                                  More details
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                </button>
+                              ) : null; })()}
                             </div>
                           </div>
                         </section>
