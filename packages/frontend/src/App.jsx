@@ -9,10 +9,17 @@ import { FeaturedSection }    from "./components/sections/FeaturedSection.jsx";
 import { CtaSection }         from "./components/sections/CtaSection.jsx";
 import { AboutPage }          from "./components/sections/AboutPage.jsx";
 import { ProgressSection }    from "./components/sections/ProgressSection.jsx";
+import { ReviewSession }      from "./components/sections/ReviewSession.jsx";
+import { QuizSession }        from "./components/sections/QuizSession.jsx";
+import { PathsIndex }         from "./components/sections/PathsIndex.jsx";
+import { PathDetail }         from "./components/sections/PathDetail.jsx";
+import { TeamDashboard }      from "./components/sections/TeamDashboard.jsx";
 import { Ticker }             from "./components/ui/Ticker.jsx";
+import { SocialProofStrip }   from "./components/ui/SocialProofStrip.jsx";
 import { TermPanel }          from "./components/overlays/TermPanel.jsx";
 import { FlashcardModal }     from "./components/overlays/FlashcardModal.jsx";
 import { LoginModal }         from "./components/overlays/LoginModal.jsx";
+import { OnboardingModal }    from "./components/overlays/OnboardingModal.jsx";
 import { MilestoneSheet }     from "./components/overlays/MilestoneSheet.jsx";
 import { SEOHead }            from "./components/ui/SEOHead.jsx";
 import { useModalState }      from "./hooks/useModalState.js";
@@ -26,6 +33,7 @@ import { TermOfTheDay }       from "./components/ui/TermOfTheDay.jsx";
 import { CategoryPage }       from "./pages/CategoryPage.jsx";
 import { CategoriesIndexPage } from "./pages/CategoriesIndexPage.jsx";
 import { NotFoundPage }       from "./pages/NotFoundPage.jsx";
+import { registerServiceWorker } from "./utils/pushNotifications.js";
 
 // Daily term is always unlocked regardless of view limit
 const DAILY_TERM_NAME = ALL_WORDS[Math.floor(Date.now() / 86400000) % ALL_WORDS.length]?.term;
@@ -37,6 +45,9 @@ function ScrollToTop() {
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 }
+
+// Register service worker for PWA
+registerServiceWorker();
 
 export default function App() {
   const { user, signOut, isPro } = useAuth();
@@ -60,7 +71,8 @@ export default function App() {
 
   const {
     completedTerms, toggleComplete, markComplete,
-    viewedTerms, trackView, isViewLimitReached,
+    viewedTerms, trackView,
+    reviewSchedule, recordReview, dueCount,
     streakDays, longestStreak, todayCount,
   } = useProgress(user, { onMilestone: handleMilestone, onNudge: handleNudge });
 
@@ -70,9 +82,32 @@ export default function App() {
   const [loginOpen,    setLoginOpen]    = useState(false);
   const [signingOut,   setSigningOut]   = useState(false);
   const [toast,        setToast]        = useState(null);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const { modalWords, modalIndex, openModal, closeModal, prevCard, nextCard, openRelated } = useModalState();
   const { drawerCat, drawerStartIndex, openDrawer, closeDrawer } = useDrawerState();
+
+  // Show onboarding for first-time visitors
+  useEffect(() => {
+    const seen = localStorage.getItem("wv_onboarding_complete");
+    if (!seen && location.pathname === "/") {
+      // Small delay so the page loads first
+      const timer = setTimeout(() => setOnboardingOpen(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleOnboardingComplete = ({ role, experience }) => {
+    setOnboardingOpen(false);
+    localStorage.setItem("wv_onboarding_complete", "1");
+    localStorage.setItem("wv_user_role", role || "");
+    localStorage.setItem("wv_user_experience", experience || "");
+  };
+
+  const handleOnboardingSkip = () => {
+    setOnboardingOpen(false);
+    localStorage.setItem("wv_onboarding_complete", "1");
+  };
 
   const showToast = (msg) => {
     setToast(typeof msg === "string" ? { message: msg } : msg);
@@ -144,11 +179,13 @@ export default function App() {
       <ScrollToTop />
       <SiteNav
         user={user}
+        isPro={isPro}
         onOpenLogin={openLogin}
         onOpenProgress={handleOpenProgress}
         onSignOut={handleSignOut}
         signingOut={signingOut}
         completedTerms={completedTerms}
+        dueCount={dueCount}
       />
 
       <Routes>
@@ -166,6 +203,7 @@ export default function App() {
               />
             )}
             <Ticker/>
+            <SocialProofStrip />
             <CategoriesSection
               onOpenDrawer={openDrawer}
               completedTerms={completedTerms}
@@ -210,6 +248,46 @@ export default function App() {
           )
         }/>
 
+        {/* Review (spaced repetition) */}
+        <Route path="/review" element={
+          <ReviewSession
+            user={user}
+            isPro={isPro}
+            reviewSchedule={reviewSchedule}
+            onRecordReview={recordReview}
+            completedTerms={completedTerms}
+          />
+        }/>
+
+        {/* Quiz */}
+        <Route path="/quiz" element={
+          <QuizSession
+            user={user}
+            isPro={isPro}
+            reviewSchedule={reviewSchedule}
+            completedTerms={completedTerms}
+            onRecordReview={recordReview}
+          />
+        }/>
+
+        {/* Learning Paths */}
+        <Route path="/paths" element={
+          <PathsIndex completedTerms={completedTerms} />
+        }/>
+        <Route path="/paths/:pathSlug" element={
+          <PathDetail
+            completedTerms={completedTerms}
+            isPro={isPro}
+            user={user}
+            onOpenModal={(words, i) => openModal(words, i)}
+          />
+        }/>
+
+        {/* Team Dashboard */}
+        <Route path="/team" element={
+          <TeamDashboard user={user} isPro={isPro} />
+        }/>
+
         {/* Categories index */}
         <Route path="/categories" element={
           <CategoriesIndexPage completedTerms={completedTerms} user={user}/>
@@ -238,7 +316,7 @@ export default function App() {
           isPro={isPro}
           unlockedTerms={DAILY_UNLOCKED}
           viewedTerms={viewedTerms}
-          isViewLimitReached={isViewLimitReached}
+          isViewLimitReached={false}
           onView={trackView}
           user={user}
           completedTerms={completedTerms}
@@ -261,7 +339,7 @@ export default function App() {
           isPro={isPro}
           unlockedTerms={DAILY_UNLOCKED}
           viewedTerms={viewedTerms}
-          isViewLimitReached={isViewLimitReached}
+          isViewLimitReached={false}
           onView={trackView}
           user={user}
           completedTerms={completedTerms}
@@ -272,6 +350,14 @@ export default function App() {
 
       {/* Login modal */}
       {loginOpen && <LoginModal onClose={() => setLoginOpen(false)}/>}
+
+      {/* Onboarding modal */}
+      {onboardingOpen && (
+        <OnboardingModal
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
+        />
+      )}
 
       {/* Milestone achievement sheet */}
       {milestone !== null && <MilestoneSheet currentCount={milestone} onClose={() => setMilestone(null)}/>}

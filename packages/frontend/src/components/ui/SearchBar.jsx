@@ -12,7 +12,7 @@ export function SearchBar({ value, onChange }) {
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
-        placeholder="Search any term — MVP, affinity map, design token…"
+        placeholder="Search any term: MVP, affinity map, design token…"
         style={{
           width: "100%", padding: "14px 16px 14px 44px",
           fontSize: 15, fontFamily: "inherit",

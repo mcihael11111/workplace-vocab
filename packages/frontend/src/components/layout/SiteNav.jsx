@@ -6,10 +6,11 @@ import { ALL_WORDS } from "../../data/words.js";
 
 const ANCHOR_LINKS = [
   ["Categories", "/categories"],
+  ["Paths",      "/paths"],
   ["Flashcards",  "/#flashcards"],
 ];
 
-export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingOut, completedTerms = new Set() }) {
+export function SiteNav({ user, isPro, onOpenLogin, onOpenProgress, onSignOut, signingOut, completedTerms = new Set(), dueCount = 0 }) {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile   = useWindowSize() < 768;
@@ -250,7 +251,7 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
                         onClick={() => { setMenuOpen(false); onOpenLogin(); }}
                         style={{ width: "100%", background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 12, padding: "14px 16px", fontSize: 15, fontWeight: 700, cursor: "pointer" }}
                       >
-                        Sign in — it's free
+                        Sign in, it's free
                       </button>
                     </>
                   )}
@@ -281,6 +282,31 @@ export function SiteNav({ user, onOpenLogin, onOpenProgress, onSignOut, signingO
           >
             About
           </Link>
+          {isLoggedIn && isPro && (
+            <Link
+              to="/review"
+              style={{ position: "relative", padding: "6px 12px", borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#64748B", textDecoration: "none", transition: "all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#F8FAFC"; e.currentTarget.style.color = "#1A1A2E"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "none";    e.currentTarget.style.color = "#64748B"; }}
+            >
+              Review
+              {dueCount > 0 && (
+                <span style={{ position: "absolute", top: 0, right: 2, background: "#EF4444", color: "#fff", fontSize: 10, fontWeight: 700, borderRadius: 99, minWidth: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px" }}>
+                  {dueCount > 99 ? "99+" : dueCount}
+                </span>
+              )}
+            </Link>
+          )}
+          {isLoggedIn && (
+            <Link
+              to="/quiz"
+              style={{ padding: "6px 12px", borderRadius: 8, fontSize: 14, fontWeight: 500, color: "#64748B", textDecoration: "none", transition: "all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#F8FAFC"; e.currentTarget.style.color = "#1A1A2E"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "none";    e.currentTarget.style.color = "#64748B"; }}
+            >
+              Quiz
+            </Link>
+          )}
 
           {isLoading ? (
             <div style={{ width: 90, height: 34, borderRadius: 8, background: "#F1F5F9", marginLeft: 8 }}/>

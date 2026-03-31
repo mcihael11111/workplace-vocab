@@ -14,8 +14,8 @@ import { useAutoComplete } from "../../hooks/useAutoComplete.js";
 //   - All touch targets ≥ 44×44px (WCAG 2.5.5)
 export function FlashcardModal({ words, activeIndex, onClose, onPrev, onNext, onOpenRelated, onUpgrade, isPro = false, unlockedTerms, viewedTerms = new Set(), isViewLimitReached = false, onView, user, completedTerms = new Set(), onToggleComplete, onMarkComplete }) {
   const word   = words[activeIndex];
-  // Locked if: not Pro, limit reached, term never viewed before, and not the daily term override
-  const locked = !isPro && isViewLimitReached && !viewedTerms.has(word.term) && !unlockedTerms?.has(word.term);
+  // Content is now free for everyone — no locked state
+  const locked = false;
   const cat    = CAT_MAP[word.category] || { accent: "#1A1A2E", color: "#F8FAFC", icon: BookOpen };
   const isDone = completedTerms.has(word.term);
   const total  = words.length;

@@ -25,7 +25,7 @@ export function HeroSection() {
         className="fade-up"
         style={{ animationDelay: "160ms", fontSize: 16, color: "#475569", lineHeight: 1.6, maxWidth: 480, margin: "0 auto", fontWeight: 400 }}
       >
-        Learn the language of design, product, and business — one term at a time.
+        Learn the language of design, product, and business. One term at a time.
       </p>
     </section>
   );

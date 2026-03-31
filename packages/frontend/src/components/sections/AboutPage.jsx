@@ -27,13 +27,13 @@ export function AboutPage({ onOpenLogin }) {
         </h1>
         <div style={{ fontSize: 18, color: "#475569", lineHeight: 1.75, marginBottom: 64, maxWidth: 620, display: "flex", flexDirection: "column", gap: 20 }}>
           <p style={{ margin: 0 }}>
-            Every workplace has its own language — and nobody hands you a dictionary on day one. You're just expected to figure it out from context, from meetings, from that one colleague who drops "TAM" and "burn rate" into every conversation like everyone already knows.
+            Every workplace has its own language. Nobody hands you a dictionary on day one. You're just expected to figure it out from context, from meetings, from that one colleague who drops "TAM" and "burn rate" into every conversation like everyone already knows.
           </p>
           <p style={{ margin: 0 }}>
-            The problem isn't that you can't learn it. It's that most resources explain jargon with more jargon, and you end up more confused than when you started. What you actually need is someone to break it down in plain language — the way a good mentor would over coffee.
+            The problem isn't that you can't learn it. It's that most resources explain jargon with more jargon, and you end up more confused than when you started. What you actually need is someone to break it down in plain language, the way a good mentor would over coffee.
           </p>
           <p style={{ margin: 0 }}>
-            That's what Workplace Vocab does. Over 400 terms across design, product, engineering, business, and more — each one explained clearly, with real context, so the knowledge actually sticks. No fluff. No five-paragraph essays. Just the words you need to walk into any room and hold your own.
+            That's what Workplace Vocab does. Over 400 terms across design, product, engineering, business, and more, each one explained clearly with real context so the knowledge actually sticks. No fluff. No five-paragraph essays. Just the words you need to walk into any room and hold your own.
           </p>
         </div>
 
@@ -42,10 +42,10 @@ export function AboutPage({ onOpenLogin }) {
         {/* Why it exists */}
         <Section label="Why it exists">
           <p>
-            There's a whole layer of language at work that nobody actually teaches you. You're just expected to pick it up — from meetings, from Slack, from overhearing someone say "let's circle back on the OKRs" like that's a normal sentence. And when you don't know a term, it's awkward to ask. So you don't. And the gap quietly grows.
+            There's a whole layer of language at work that nobody actually teaches you. You're expected to pick it up from meetings, from Slack, from overhearing someone say "let's circle back on the OKRs" like that's a normal sentence. And when you don't know a term, it's awkward to ask. So you don't. And the gap quietly grows.
           </p>
           <p>
-            That's what Workplace Vocab is here to fix. No textbooks, no hour-long courses. Just clear, honest explanations of the words that actually come up at work — the ones that make you sound like you know what you're talking about (because you will).
+            That's what Workplace Vocab is here to fix. No textbooks, no hour-long courses. Just clear, honest explanations of the words that actually come up at work, the ones that make you sound like you know what you're talking about (because you will).
           </p>
         </Section>
 
@@ -57,10 +57,19 @@ export function AboutPage({ onOpenLogin }) {
             Honestly? Pretty much anyone with a job. But especially:
           </p>
           <p>
-            You just landed your first role on a product team and stand-ups feel like a foreign language. Or you're a marketer who's suddenly working with engineers and half the words in their Jira tickets might as well be in code. Maybe you're running a startup and you want to talk to every part of your team without sounding like you're bluffing. Or you've switched industries and you're rebuilding your vocabulary from scratch — even though you've got ten years of experience.
+            You just landed your first role on a product team and stand-ups feel like a foreign language.
           </p>
           <p>
-            If you've ever walked out of a meeting thinking "I really should know what that means" — welcome. You're in the right place.
+            You're a marketer suddenly working with engineers, and half the words in their Jira tickets might as well be in code.
+          </p>
+          <p>
+            You're running a startup and want to talk to every part of your team without sounding like you're bluffing.
+          </p>
+          <p>
+            You've switched industries and you're rebuilding your vocabulary from scratch, even with ten years of experience.
+          </p>
+          <p>
+            If you've ever walked out of a meeting thinking "I really should know what that means", welcome. You're in the right place.
           </p>
         </Section>
 
@@ -69,10 +78,19 @@ export function AboutPage({ onOpenLogin }) {
         {/* The content */}
         <Section label="What you'll find here">
           <p>
-            Every term here was picked because it actually comes up — in sprint reviews, strategy meetings, stakeholder decks, product critiques, job interviews. Nothing theoretical. Nothing you'd only find in a textbook. Just the language that shows up when real work is happening.
+            Every term here was picked because it actually comes up in sprint reviews, strategy meetings, stakeholder decks, product critiques, and job interviews. Nothing theoretical. Nothing you'd only find in a textbook. Just the language that shows up when real work is happening.
           </p>
           <p>
-            And each term goes deeper than a one-liner. You get a plain-language definition, why it matters in context, a real scenario so you can see it in action, and related terms so the ideas start connecting instead of sitting in a list. Because that's how vocabulary actually sticks — when you can see how things link together.
+            Each term goes deeper than a one-liner:
+          </p>
+          <p>
+            <strong>A plain-language definition</strong> so you understand the concept immediately.<br/>
+            <strong>Why it matters</strong> so you know when and where it applies.<br/>
+            <strong>A real scenario</strong> so you can see it in context.<br/>
+            <strong>Related terms</strong> so ideas connect instead of sitting in a list.
+          </p>
+          <p>
+            That's how vocabulary actually sticks, when you can see how things link together.
           </p>
           <p>
             Right now there are over 400 terms across Product Design, Engineering, Business, Marketing, Finance, and Legal. And it keeps growing.
@@ -84,7 +102,7 @@ export function AboutPage({ onOpenLogin }) {
         {/* The builder */}
         <Section label="Who built this">
           <p>
-            Hi — I'm Michael Papanikolaou, a designer and product person based in Australia. I built this because I spent years sitting in rooms where the people with the clearest vocabulary had a real advantage. Not always the best ideas — just the best words for them. And I watched smart, capable people hold back because they weren't sure if they were using a term correctly.
+            Hi, I'm Michael Papanikolaou, a designer and product person based in Australia. I built this because I spent years sitting in rooms where the people with the clearest vocabulary had a real advantage. Not always the best ideas, just the best words for them. And I watched smart, capable people hold back because they weren't sure if they were using a term correctly.
           </p>
           <p>
             That bugged me. Language shouldn't be a gatekeeping thing. If you've got the words, you can jump into the conversation. And if you can do that, you can lead it. That's the whole idea behind this.
@@ -113,7 +131,7 @@ export function AboutPage({ onOpenLogin }) {
               onClick={onOpenLogin}
               style={{ background: "#1A1A2E", color: "#fff", border: "none", borderRadius: 12, padding: "14px 28px", fontSize: 15, fontWeight: 700, cursor: "pointer" }}
             >
-              Start learning — it's free
+              Start learning, it's free
             </button>
             <Link
               to="/categories"

@@ -16,7 +16,7 @@ export function LoginModal({ onClose }) {
       onClose(); // Popup complete — close the modal
     } catch (e) {
       if (e.code !== "auth/popup-closed-by-user") {
-        setError("Sign-in failed — please try again.");
+        setError("Sign-in failed. Please try again.");
       }
       setLoading(false);
     }

@@ -32,7 +32,7 @@ export function FeaturedSection({ activeFilter, onFilterChange, onOpenModal, com
         ))}
       </div>
       <p style={{ textAlign: "center", marginTop: 20, fontSize: 13, color: "#94A3B8" }}>
-        Tap any card to open — use ← → keys or the chevrons to navigate
+        Tap any card to open. Use ← → keys or the chevrons to navigate.
       </p>
     </section>
   );

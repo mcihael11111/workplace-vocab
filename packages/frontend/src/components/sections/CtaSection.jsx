@@ -19,7 +19,7 @@ export function CtaSection({ onOpenLogin }) {
             <span style={{ fontStyle: "italic", color: "#94A3B8" }}>are the ideas you'll lead with tomorrow.</span>
           </h2>
           <p style={{ fontSize: 15, color: "#64748B", maxWidth: 460, lineHeight: 1.6 }}>
-            Built for designers, product managers, developers, and anyone who works in product — at any stage of their career.
+            Built for designers, product managers, developers, and anyone who works in product, at any stage of their career.
           </p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 200 }}>

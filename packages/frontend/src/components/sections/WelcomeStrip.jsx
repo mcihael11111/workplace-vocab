@@ -55,7 +55,7 @@ export function WelcomeStrip({ user, completedTerms, onResume }) {
             onClick={handleResume}
             style={{ display: "flex", alignItems: "center", gap: 8, background: "#fff", color: "#1A1A2E", border: "none", borderRadius: 10, padding: "10px 20px", fontSize: 14, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
           >
-            Resume — {nextWord.term}
+            Resume: {nextWord.term}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         )}
