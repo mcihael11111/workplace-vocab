@@ -40,7 +40,7 @@ export function TermOfTheDay({ completedTerms, onOpen }) {
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#94A3B8", margin: 0 }}>
-              Word of the day
+              Term of the day
             </p>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: cat.color, borderRadius: 99, padding: "3px 8px 3px 6px" }}>
               <cat.icon size={11} color={cat.accent} strokeWidth={2} />
